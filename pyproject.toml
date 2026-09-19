@@ -1,0 +1,45 @@
+[build-system]
+requires = ["hatchling==1.27.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "vais-voice"
+version = "0.1.0"
+description = "Reproducible KZ/RU synthetic speech detection and generation research infrastructure."
+readme = "README.md"
+requires-python = ">=3.11,<3.13"
+license = "MIT"
+authors = [{ name = "Vais Research" }]
+dependencies = [
+  "numpy==2.2.6",
+  "scipy==1.15.3",
+  "pandas==2.2.3",
+  "scikit-learn==1.6.1",
+  "soundfile==0.13.1",
+  "pydantic==2.11.7",
+  "PyYAML==6.0.2",
+  "pyarrow==20.0.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest==8.4.2", "pytest-cov==6.2.1", "ruff==0.12.12"]
+ml = ["torch", "torchaudio"]
+
+[project.scripts]
+vais-voice = "vais_voice.data.cli:main"
+
+[project.urls]
+Repository = "https://github.com/KazakhstanAi/vais-voice"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/vais_voice"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

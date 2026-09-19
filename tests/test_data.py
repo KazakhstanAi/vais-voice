@@ -1,0 +1,153 @@
+import json
+
+import numpy as np
+import pytest
+import soundfile as sf
+from pydantic import ValidationError
+
+from vais_voice.datasets.manifest import Sample, read_manifest
+from vais_voice.datasets.split import assign_splits, connected_groups
+from vais_voice.preprocessing.audio import preprocess
+from vais_voice.utils.io import contained_path
+
+
+def test_unknown_fields_and_missing_synthetic_provenance(corpus):
+    root, _ = corpus
+    row = read_manifest(root / "input.jsonl")[1].model_dump()
+    row["generator_id"] = None
+    with pytest.raises(ValidationError):
+        Sample.model_validate(row)
+    row["generator_id"] = "fixture"
+    row["secret"] = "must_not_be_silently_accepted"
+    with pytest.raises(ValidationError):
+        Sample.model_validate(row)
+
+
+def test_duplicate_ids(corpus):
+    root, _ = corpus
+    path = root / "input.jsonl"
+    line = path.read_text().splitlines()[0]
+    path.write_text(line + "\n" + line)
+    with pytest.raises(ValueError, match="Duplicate"):
+        read_manifest(path)
+
+
+def test_speaker_source_and_hash_leakage(corpus):
+    root, _ = corpus
+    rows = read_manifest(root / "input.jsonl")
+    for update in (
+        {"speaker_id": rows[0].speaker_id},
+        {"source_id": rows[0].source_id},
+    ):
+        changed = list(rows)
+        changed[2] = rows[2].model_copy(update=update)
+        with pytest.raises(ValueError, match="leakage"):
+            assign_splits(
+                changed, seed=42, train_fraction=0.7, val_fraction=0.15, unseen_generators=[]
+            )
+    rows[0] = rows[0].model_copy(update={"source_sha256": "a" * 64})
+    rows[2] = rows[2].model_copy(update={"source_sha256": "a" * 64})
+    with pytest.raises(ValueError, match="leakage"):
+        assign_splits(rows, seed=42, train_fraction=0.7, val_fraction=0.15, unseen_generators=[])
+
+
+def test_transitive_grouping(corpus):
+    root, _ = corpus
+    rows = read_manifest(root / "input.jsonl")[:3]
+    rows[2] = rows[2].model_copy(update={"speaker_id": rows[1].speaker_id})
+    assert len(connected_groups(rows)) == 1
+
+
+def test_unseen_generator_in_train_rejected(corpus):
+    root, _ = corpus
+    with pytest.raises(ValueError, match="Unseen"):
+        assign_splits(
+            read_manifest(root / "input.jsonl"),
+            seed=42,
+            train_fraction=0.7,
+            val_fraction=0.15,
+            unseen_generators=["test_fixture_v1"],
+        )
+
+
+def test_partial_supplied_split_rejected(corpus):
+    root, _ = corpus
+    rows = read_manifest(root / "input.jsonl")
+    rows[0] = rows[0].model_copy(update={"split": None})
+    with pytest.raises(ValueError, match="every row"):
+        assign_splits(rows, seed=42, train_fraction=0.7, val_fraction=0.15, unseen_generators=[])
+
+
+def test_automatic_splits_deterministic_and_order_independent(corpus):
+    root, _ = corpus
+    base = read_manifest(root / "input.jsonl")[:2]
+    rows = []
+    for group in range(60):
+        for label_index, row in enumerate(base):
+            rows.append(
+                row.model_copy(
+                    update={
+                        "sample_id": f"g{group}_{label_index}",
+                        "speaker_id": f"p{group}",
+                        "source_id": f"source{group}",
+                        "split": None,
+                    }
+                )
+            )
+    kwargs = {"seed": 42, "train_fraction": 0.7, "val_fraction": 0.15, "unseen_generators": []}
+    first = assign_splits(rows, **kwargs)
+    second = assign_splits(list(reversed(rows)), **kwargs)
+    assert {r.sample_id: r.split for r in first} == {r.sample_id: r.split for r in second}
+    assert {r.split for r in first} == {"train", "val", "test"}
+
+
+def test_path_traversal_rejected(tmp_path):
+    with pytest.raises(ValueError, match="escapes"):
+        contained_path(tmp_path, "../elsewhere.wav")
+
+
+def test_stereo_downmix_and_resample(tmp_path):
+    source = tmp_path / "stereo.wav"
+    sf.write(source, np.ones((800, 2), dtype="float32") * 0.1, 8000)
+    dest = tmp_path / "mono.wav"
+    preprocess(source, dest, sample_rate=16000, max_duration_seconds=1, max_file_bytes=100000)
+    info = sf.info(dest)
+    assert info.channels == 1
+    assert info.samplerate == 16000
+    assert info.frames == 1600
+    with pytest.raises(FileExistsError):
+        preprocess(source, dest, sample_rate=16000, max_duration_seconds=1, max_file_bytes=100000)
+
+
+@pytest.mark.parametrize(("duration", "size"), [(0.01, 100000), (1, 1)])
+def test_audio_limits(corpus, duration, size):
+    root, _ = corpus
+    with pytest.raises(ValueError, match="limit"):
+        preprocess(
+            root / "raw/s0_0.wav",
+            root / "out.wav",
+            sample_rate=16000,
+            max_duration_seconds=duration,
+            max_file_bytes=size,
+        )
+
+
+def test_nonfinite_audio_rejected(tmp_path):
+    source = tmp_path / "nan.wav"
+    sf.write(source, np.array([0.1, np.nan]), 8000, subtype="FLOAT")
+    with pytest.raises(ValueError, match="Nonfinite"):
+        preprocess(
+            source,
+            tmp_path / "out.wav",
+            sample_rate=16000,
+            max_duration_seconds=1,
+            max_file_bytes=100000,
+        )
+
+
+def test_blank_speaker_rejected(corpus):
+    root, _ = corpus
+    row = json.loads((root / "input.jsonl").read_text().splitlines()[0])
+    row["speaker_id"] = " "
+    with pytest.raises(ValidationError):
+        Sample.model_validate(row)

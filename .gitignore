@@ -1,0 +1,42 @@
+# Environment / credentials
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+# Python / tools
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+# Local data and metadata
+data/raw/
+data/processed/
+data/manifests/local/
+# Experiments: recordings, checkpoints, predictions, metrics, environment snapshots
+runs/
+*.wav
+*.flac
+*.mp3
+*.ogg
+*.opus
+*.m4a
+*.aac
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+*.parquet
+# Editor / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

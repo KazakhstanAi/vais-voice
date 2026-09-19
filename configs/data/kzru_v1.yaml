@@ -1,0 +1,15 @@
+dataset_version: kzru_v1
+split_version: speaker_source_v1
+seed: 42
+# Paths resolve against project_root, NOT the current shell directory.
+project_root: ../..
+manifest: data/manifests/local/kzru_v1.jsonl
+audio_root: data/raw
+output_dir: data/processed/kzru_v1
+sample_rate: 16000
+max_duration_seconds: 120
+max_file_bytes: 52428800
+train_fraction: 0.7
+val_fraction: 0.15
+# Entire speaker/source-connected groups containing these generators go to test.
+unseen_generators: []

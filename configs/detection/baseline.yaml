@@ -1,0 +1,10 @@
+experiment: baseline
+seed: 42
+project_root: ../..
+prepared_manifest: data/processed/kzru_v1/manifest.split.parquet
+preparation_report: data/processed/kzru_v1/split_preparation.json
+run_dir: runs/baseline
+model:
+  name: pending_baseline_selection
+  sample_rate: 16000
+# This milestone implements preflight only, not a training loop.

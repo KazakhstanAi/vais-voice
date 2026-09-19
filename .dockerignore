@@ -1,0 +1,16 @@
+.git
+.venv
+**/__pycache__
+.pytest_cache
+.ruff_cache
+data/raw
+data/processed
+data/manifests/local
+runs
+.env*
+*.pt
+*.pth
+*.wav
+*.mp3
+*.ogg
+*.opus

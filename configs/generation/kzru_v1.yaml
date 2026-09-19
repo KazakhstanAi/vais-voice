@@ -1,0 +1,5 @@
+purpose: consented_research_fixtures
+backend: not_selected
+voice_rights: review_required
+output_dir: runs/generation
+# No model downloads, cloning, network requests or synthesis are implemented.
