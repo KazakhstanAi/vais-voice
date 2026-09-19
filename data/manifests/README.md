@@ -24,6 +24,9 @@ Paths are relative to raw root before preparation, manifest directory afterwards
 | usage_permission | Must be approved |
 | condition | clean/noise/etc., defaults clean |
 | source_sha256, processed_sha256 | Computed integrity hashes |
+| attack_id | Optional ASVspoof attack/system identifier |
+| source_record_id | Optional verbatim source-side record identifier |
+| missing_metadata | Explicit names of unavailable metadata fields |
 
 No derivatives or speakers cross splits. Explicit unseen generators never enter train/val.
 Approval metadata does not replace rights review. Private manifests belong in ignored local/.

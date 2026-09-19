@@ -123,6 +123,48 @@ QAIRU пока не проверен. CUDA в репозиторий не кла
 GitHub Actions: Windows/Linux lint/tests, CPU Docker build и полный smoke pipeline
 внутри только что построенного image.
 
+## Dataset ingestion
+
+The canonical manifest is the strict JSONL/Parquet contract in
+`src/vais_voice/datasets/schema.py`. Local source adapters translate source-specific metadata
+into that contract; they never edit raw files and never download datasets. The supported internal
+language codes are `kk`, `ru`, `kk_ru`, and `other` (never `kz`). `kk_ru` requires an explicit
+source annotation or user mapping; it is not inferred from occasional borrowed words.
+
+Source configs under `configs/data/sources/` pin the official release/config or track, license,
+URLs, citation, DOI, revision, and adapter layout version. Review those upstream terms again when
+changing a revision. A downloadable dataset is not assumed to permit unrestricted use. Raw
+datasets and local manifests remain ignored because their licenses, size, and access conditions
+differ from this repository's MIT-licensed code. The verification matrix and exact layouts are in
+[`docs/dataset-layouts.md`](docs/dataset-layouts.md).
+
+To build a bounded local subset, review `configs/data/kzru_real_v01.yaml` and its source configs,
+then run:
+
+```bash
+python -m vais_voice.data.prepare --config configs/data/kzru_real_v01.yaml
+```
+
+The immutable output contains processed audio, canonical JSONL and Parquet manifests,
+`dataset_report.json`, and a provenance-rich `preparation.json`. Limits and filters live in YAML;
+exact-content duplicates are reported and retained unless `duplicate_policy: error` is selected.
+ASVspoof is tagged `external_sanity` and is excluded by the default `include_roles: [primary]`.
+Build it only as an explicitly separate reference dataset; it is not KZ/RU corpus data.
+
+KSC2 accepts a reviewed CSV/TSV/Parquet table or discovers the official FLAC/TXT sidecar tree.
+FLEURS accepts the official headerless seven-column TSV layout and explicit `kk_kz`/`ru_ru`
+source configs. ASVspoof maps
+protocol `bonafide` to `real`, `spoof` to `synthetic`, and stores attack/system identifiers in
+`attack_id` (also used as the required synthetic `generator_id`). KSC2 and both FLEURS adapters
+and ASVspoof DF adapters have been exercised on tiny real local subsets. ASVspoof remains an
+external-sanity source and is not included in the primary KZ/RU pilot manifest.
+
+To add a source, implement `DatasetAdapter` under `vais_voice.datasets.adapters`, register it in
+the adapter registry, add explicit source provenance YAML, and test it with tiny generated audio
+and synthetic metadata only. Preserve the research invariants: no derivatives of one recording
+may cross splits, protected speaker-independent tests have no speaker overlap, and unseen-generator
+tests have no generator overlap with training.
+
 ## Этапы
 
 1. Phase 0: schema → prepare → protected splits → dummy inference → evaluation/report.

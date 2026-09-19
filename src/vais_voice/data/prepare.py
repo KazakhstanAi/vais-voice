@@ -5,6 +5,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from vais_voice.datasets.build import build_dataset
 from vais_voice.datasets.manifest import read_manifest, write_manifest
 from vais_voice.datasets.split import assign_splits
 from vais_voice.preprocessing.audio import preprocess
@@ -37,7 +38,12 @@ class DataConfig(BaseModel):
 
 def prepare(config_path: Path, *, split_now: bool = False) -> Path:
     config_path = config_path.resolve()
-    config = DataConfig.model_validate(load_yaml(config_path))
+    raw_config = load_yaml(config_path)
+    if "sources" in raw_config:
+        if split_now:
+            raise ValueError("Adapter dataset builds cannot be split during ingestion")
+        return build_dataset(config_path)
+    config = DataConfig.model_validate(raw_config)
     root = (config_path.parent / config.project_root).resolve()
     manifest = (root / config.manifest).resolve()
     audio_root = (root / config.audio_root).resolve()

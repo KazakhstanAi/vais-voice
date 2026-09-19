@@ -1,0 +1,22 @@
+adapter: asvspoof2021
+local_root: ../../../data/raw/asvspoof2021
+protocol_file: keys/DF/CM/trial_metadata.txt
+audio_dir: ASVspoof2021_DF_eval/flac
+language: other
+metadata:
+  source_id: asvspoof2021_df
+  name: ASVspoof 2021 Speech Deepfake
+  version: "1.0"
+  homepage_url: https://www.asvspoof.org/index2021.html
+  download_url: https://doi.org/10.5281/zenodo.4835108
+  license: Open Data Commons Open Database License (ODbL) 1.0 + Database Contents License (DbCL) 1.0
+  license_url: https://opendatacommons.org/licenses/odbl/1-0/
+  citation: "Yamagishi, J. et al. (2021). ASVspoof 2021: Accelerating Progress in Spoofed and Deepfake Speech Detection. Proc. ASVspoof Challenge Workshop, 47-54."
+  doi: 10.5281/zenodo.4835108
+  source_config: null
+  track: DF
+  release_revision: Zenodo record 4835108 revision 2
+  layout_version: asvspoof2021_df_keys_v1
+  languages: [other]
+  intended_role: external_sanity
+  notes: Paper DOI 10.21437/ASVSPOOF.2021-8. The challenge page says Open Data Commons Attribution, while the DF archive LICENSE.DF.txt and Zenodo metadata specify ODbL/DbCL; the packaged license is recorded here. Excluded from primary builds.

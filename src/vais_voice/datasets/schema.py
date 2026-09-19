@@ -1,3 +1,4 @@
+
 """Canonical metadata. kk is ISO 639-1 for Kazakh."""
 
 from typing import Literal
@@ -28,6 +29,9 @@ class Sample(BaseModel):
     processed_sha256: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
     sample_rate: int | None = Field(default=None, gt=0)
     duration_sec: float | None = Field(default=None, gt=0)
+    attack_id: str | None = None
+    source_record_id: str | None = None
+    missing_metadata: list[str] = Field(default_factory=list)
 
     @field_validator("related_speaker_ids")
     @classmethod
@@ -35,6 +39,13 @@ class Sample(BaseModel):
         if any(not speaker.strip() for speaker in value):
             raise ValueError("Related speaker identifiers must be nonempty")
         return [speaker.strip() for speaker in value]
+
+    @field_validator("missing_metadata")
+    @classmethod
+    def clean_missing_metadata(cls, value: list[str]) -> list[str]:
+        if any(not item.strip() for item in value):
+            raise ValueError("Missing-metadata field names must be nonempty")
+        return sorted(set(item.strip() for item in value))
 
     @model_validator(mode="after")
     def check_provenance(self) -> "Sample":

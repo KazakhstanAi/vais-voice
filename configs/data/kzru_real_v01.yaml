@@ -1,0 +1,22 @@
+dataset_id: vais_kzru_real
+dataset_version: v0.1
+project_root: ../..
+output_dir: data/processed/kzru_real_v01
+# external_sanity must be added explicitly to include_roles for a separate reference build.
+include_roles: [primary]
+languages: [kk, ru, kk_ru]
+max_samples: 10000
+max_duration_hours: 100
+duplicate_policy: report
+sample_rate: 16000
+max_duration_seconds: 120
+max_file_bytes: 52428800
+sources:
+  - config: sources/ksc2.yaml
+    max_samples: 4000
+  - config: sources/fleurs_kk.yaml
+    max_samples: 3000
+  - config: sources/fleurs_ru.yaml
+    max_samples: 3000
+  # Listed for provenance visibility, but excluded because its role is external_sanity.
+  - config: sources/asvspoof2021.yaml

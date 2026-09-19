@@ -1,0 +1,22 @@
+adapter: ksc2
+# Resolved relative to this file. Point this at a reviewed local copy/subset.
+local_root: ../../../data/raw/ksc2
+audio_dir: .
+language: kk
+metadata:
+  source_id: ksc2
+  name: Kazakh Speech Corpus 2
+  version: KSC2 official 2022 release
+  homepage_url: https://issai.nu.edu.kz/kz-speech-corpus/
+  download_url: https://huggingface.co/datasets/issai/Kazakh_Speech_Corpus_2
+  license: Creative Commons Attribution 4.0 International (CC BY 4.0)
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  citation: "Mussakhojayeva, S.; Khassanov, Y.; Varol, H. A. (2022). KSC2: An Industrial-Scale Open-Source Kazakh Speech Corpus. Interspeech 2022, 1367-1371."
+  doi: 10.48342/m90y-aj02
+  source_config: null
+  track: null
+  release_revision: cececbec1049f93f34a7421552500da01971ead8
+  layout_version: issai_ksc2_sidecar_v1
+  languages: [kk, kk_ru]
+  intended_role: primary
+  notes: Paper DOI 10.21437/Interspeech.2022-421. The official ISSAI project page states CC BY 4.0, while the current Hugging Face card displays MIT; this config follows ISSAI's dataset-specific statement. The archive has split/source directories with same-stem FLAC and UTF-8 TXT sidecars; no utterance-level speaker ID was observed in the verified subset.
