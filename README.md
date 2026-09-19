@@ -23,7 +23,9 @@ ruff format --check .
 
 Linux: python3.11 -m venv .venv, затем source .venv/bin/activate.
 Smoke создаёт **20 математических сигналов, не речь** (10 условных real / 10 synthetic).
-Dummy всегда возвращает 0.5. Метрики проверяют только код, не качество модели.
+Dummy всегда возвращает 0.5. Evaluator помечает одинаковые scores как
+`degenerate_constant_scores`, а ROC-AUC/EER/FPR@TPR95 записывает как `null`.
+Метрики проверяют только код, не качество модели.
 Результаты: runs/smoke/runs/dummy/{metrics.json,predictions.csv,config.yaml,
 dataset_snapshot.json,experiment.json,report.md}. Повтор: --output runs/smoke-v2.
 Существующие данные не перезаписываются.
@@ -118,7 +120,8 @@ Python 3.11 + FFmpeg + libsndfile, core/dev dependencies, непривилеги
 Optional build args TORCH_VERSION и TORCH_INDEX_URL задают совместимую пару torch/torchaudio.
 GPU runtime требует совместимый host driver, NVIDIA Container Toolkit, --gpus all.
 QAIRU пока не проверен. CUDA в репозиторий не кладём; Docker Compose не нужен.
-GitHub Actions: Windows/Linux lint/tests и CPU Docker build.
+GitHub Actions: Windows/Linux lint/tests, CPU Docker build и полный smoke pipeline
+внутри только что построенного image.
 
 ## Этапы
 

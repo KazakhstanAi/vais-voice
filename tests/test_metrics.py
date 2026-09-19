@@ -10,11 +10,14 @@ def test_perfect_ranking():
     assert result["fpr_at_tpr95"] == 0
 
 
-def test_tied_scores_linear_roc_convention():
+def test_constant_scores_are_explicitly_degenerate():
     result = detection_metrics([0, 1, 0, 1], [0.5] * 4)
-    assert result["roc_auc"] == 0.5
-    assert result["eer"] == pytest.approx(0.5)
-    assert result["fpr_at_tpr95"] == pytest.approx(0.95)
+    assert result["status"] == "degenerate_constant_scores"
+    assert result["unique_scores"] == 1
+    assert result["score_min"] == result["score_max"] == 0.5
+    assert result["roc_auc"] is None
+    assert result["eer"] is None
+    assert result["fpr_at_tpr95"] is None
 
 
 def test_reversed_ranking():

@@ -31,6 +31,12 @@ def test_prepare_and_report(corpus):
     assert report["slices"]["language"]["kk_ru"]["n"] == 2
     assert report["slices"]["generator_with_all_real_references"]["test_fixture_v1"]["n"] == 2
     assert (root / "report/report.md").is_file()
+    experiment = json.loads((root / "report/experiment.json").read_text())
+    assert "git_commit" in experiment
+    assert experiment["config_sha256"]
+    assert experiment["manifest_sha256"] == experiment["split_manifest_sha256"]
+    assert experiment["packages"]
+    assert experiment["created_at_utc"]
     with pytest.raises(FileExistsError):
         evaluate_predictions(
             output / "manifest.jsonl",

@@ -28,3 +28,4 @@ jobs:
       - run: docker build -t vais-voice:ci .
       - run: docker run --rm vais-voice:ci
       - run: docker run --rm vais-voice:ci pytest -q
+      - run: docker run --rm vais-voice:ci python scripts/smoke_pipeline.py

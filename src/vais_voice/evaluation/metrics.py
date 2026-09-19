@@ -22,6 +22,18 @@ def detection_metrics(labels: list[int], scores: list[float]) -> dict[str, Any]:
             "eer": None,
             "fpr_at_tpr95": None,
         }
+    unique_scores = np.unique(s)
+    if len(unique_scores) < 2:
+        return {
+            **counts,
+            "status": "degenerate_constant_scores",
+            "unique_scores": 1,
+            "score_min": float(unique_scores[0]),
+            "score_max": float(unique_scores[0]),
+            "roc_auc": None,
+            "eer": None,
+            "fpr_at_tpr95": None,
+        }
     fpr, tpr, _ = roc_curve(y, s, drop_intermediate=False)
     difference = fpr + tpr - 1
     right = int(np.flatnonzero(difference >= 0)[0])
@@ -40,6 +52,9 @@ def detection_metrics(labels: list[int], scores: list[float]) -> dict[str, Any]:
     return {
         **counts,
         "status": "ok",
+        "unique_scores": int(len(unique_scores)),
+        "score_min": float(s.min()),
+        "score_max": float(s.max()),
         "roc_auc": float(roc_auc_score(y, s)),
         "eer": eer,
         "fpr_at_tpr95": fpr95,

@@ -51,6 +51,14 @@ def test_speaker_source_and_hash_leakage(corpus):
         assign_splits(rows, seed=42, train_fraction=0.7, val_fraction=0.15, unseen_generators=[])
 
 
+def test_same_speaker_cannot_cross_train_and_test(corpus):
+    root, _ = corpus
+    rows = read_manifest(root / "input.jsonl")
+    rows[4] = rows[4].model_copy(update={"speaker_id": rows[0].speaker_id})
+    with pytest.raises(ValueError, match="leakage"):
+        assign_splits(rows, seed=42, train_fraction=0.7, val_fraction=0.15, unseen_generators=[])
+
+
 def test_transitive_grouping(corpus):
     root, _ = corpus
     rows = read_manifest(root / "input.jsonl")[:3]
@@ -58,7 +66,7 @@ def test_transitive_grouping(corpus):
     assert len(connected_groups(rows)) == 1
 
 
-def test_unseen_generator_in_train_rejected(corpus):
+def test_same_unseen_generator_cannot_cross_train_and_test(corpus):
     root, _ = corpus
     with pytest.raises(ValueError, match="Unseen"):
         assign_splits(

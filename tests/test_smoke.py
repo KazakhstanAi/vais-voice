@@ -30,14 +30,17 @@ def test_twenty_sample_cli_pipeline(tmp_path):
     ):
         assert (output / name).is_file()
     metrics = json.loads((output / "metrics.json").read_text())
-    assert metrics["overall"]["roc_auc"] == 0.5
+    assert metrics["overall"]["status"] == "degenerate_constant_scores"
+    assert metrics["overall"]["roc_auc"] is None
+    assert metrics["overall"]["eer"] is None
+    assert metrics["overall"]["fpr_at_tpr95"] is None
     assert "DUMMY_INFRASTRUCTURE_ONLY" in metrics["inference"]["warning"]
 
 
 def test_parent_lineage_protects_split(corpus):
     root, _ = corpus
     rows = read_manifest(root / "input.jsonl")
-    rows[2] = rows[2].model_copy(update={"parent_sample_id": rows[0].sample_id})
+    rows[4] = rows[4].model_copy(update={"parent_sample_id": rows[0].sample_id})
     with pytest.raises(ValueError, match="leakage"):
         assign_splits(rows, seed=42, train_fraction=0.7, val_fraction=0.15, unseen_generators=[])
 

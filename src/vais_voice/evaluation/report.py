@@ -81,6 +81,8 @@ def evaluate_predictions(
         "split_version": prep["split_version"],
         "seed": prep["seed"],
         "manifest_sha256": sha256(manifest),
+        "split_manifest_sha256": sha256(manifest),
+        "split_artifact_hashes": prep.get("manifest_hashes", {}),
         "predictions_sha256": sha256(predictions),
         "preparation_sha256": sha256(preparation),
         "score_direction": "higher_is_more_synthetic",
@@ -95,6 +97,7 @@ def evaluate_predictions(
             "Generator comparisons use all genuine test references; inspect channel confounding.",
             "FPR@TPR95 is a descriptive test-ROC metric, not a deployment threshold.",
             "No confidence intervals or calibration estimates are implemented yet.",
+            "Constant-score predictors are marked degenerate; discrimination metrics are null.",
         ],
     }
     artifacts = [
@@ -114,8 +117,9 @@ def evaluate_predictions(
     if not same_predictions:
         with target_predictions.open("xb") as stream:
             stream.write(predictions.read_bytes())
+    config_snapshot = {"data": prep["config"], "inference": provenance}
     with (output / "config.yaml").open("x", encoding="utf-8") as stream:
-        yaml.safe_dump({"data": prep["config"], "inference": provenance}, stream)
+        yaml.safe_dump(config_snapshot, stream)
     write_json(
         output / "dataset_snapshot.json",
         {
@@ -130,6 +134,12 @@ def evaluate_predictions(
         {
             **snapshot(project_root),
             "seed": prep["seed"],
+            "config": config_snapshot,
+            "config_sha256": sha256(output / "config.yaml"),
+            "manifest_sha256": sha256(manifest),
+            "split_manifest_sha256": sha256(manifest),
+            "split_artifact_hashes": prep.get("manifest_hashes", {}),
+            "preparation_sha256": sha256(preparation),
             "inference": provenance,
             "checkpoint": provenance.get("checkpoint"),
             "metrics": "metrics.json",
