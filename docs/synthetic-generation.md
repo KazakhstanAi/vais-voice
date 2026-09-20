@@ -62,6 +62,11 @@ canonical JSONL/Parquet synthetic manifests, a runtime snapshot, and a machine-r
 only on completed outputs. Generator output rate and format are preserved and recorded; detector
 resampling belongs to later preprocessing.
 
+On Windows, the Python Piper runtime receives text through a temporary UTF-8 `--input-file` rather
+than stdin. A UTF-8 pipe can otherwise be decoded by the child Python process using the active
+Windows console code page, producing valid but linguistically corrupted audio. The temporary input
+is removed immediately after inference.
+
 The pilot limits of 250 Kazakh and 250 Russian texts are YAML values. Nothing downloads models or
 generates audio during package installation, imports, tests, or CI. The deterministic sine adapter is
 not speech and exists only to test infrastructure offline.

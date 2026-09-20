@@ -1,7 +1,9 @@
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
+import soundfile as sf
 
 from vais_voice.datasets.manifest import read_manifest, write_manifest
 from vais_voice.datasets.roles import validate_generator_roles
@@ -346,6 +348,7 @@ def test_piper_runtime_rejects_model_hash_mismatch(tmp_path: Path) -> None:
         {
             "adapter": "piper",
             "verification_status": "verified",
+            "supports_seed": False,
             "voices": [],
             "voice_id": "fixture",
             "runtime": {
@@ -358,6 +361,75 @@ def test_piper_runtime_rejects_model_hash_mismatch(tmp_path: Path) -> None:
 
     with pytest.raises(RuntimeError, match="checksum mismatch"):
         PiperGenerator(GeneratorConfig.model_validate(raw)).validate_runtime()
+
+
+def test_python_piper_uses_utf8_input_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    executable = tmp_path / "python.exe"
+    model = tmp_path / "voice.onnx"
+    model_config = tmp_path / "voice.onnx.json"
+    for path, content in (
+        (executable, b"fixture executable"),
+        (model, b"fixture model"),
+        (model_config, b"{}"),
+    ):
+        path.write_bytes(content)
+    raw = fake_config()
+    raw.update(
+        {
+            "adapter": "piper",
+            "verification_status": "verified",
+            "supports_seed": False,
+            "voices": [],
+            "voice_id": "fixture",
+            "runtime": {
+                "executable": str(executable),
+                "entrypoint": "python_module",
+                "module": "piper",
+                "model_path": str(model),
+            },
+        }
+    )
+    output = tmp_path / "output.wav"
+
+    def fake_run(command: list[str], **kwargs: object) -> SimpleNamespace:
+        assert "--input-file" in command
+        input_path = Path(command[command.index("--input-file") + 1])
+        assert input_path.read_text(encoding="utf-8") == "Сәлеметсіз бе.\n"
+        assert kwargs["input"] is None
+        sf.write(output, [0.0, 0.1], 22050)
+        return SimpleNamespace(returncode=0, stderr="")
+
+    monkeypatch.setattr("vais_voice.generation.adapters.piper.subprocess.run", fake_run)
+    text = TextItem(
+        text_id="kk_utf8",
+        text="Сәлеметсіз бе.",
+        language="kk",
+        source_dataset="fixture",
+        source_record_id="record",
+        source_sample_id="sample",
+        normalized_text="Сәлеметсіз бе.",
+    )
+    PiperGenerator(GeneratorConfig.model_validate(raw)).synthesize(text, output, None, None, {})
+    assert not list(tmp_path.glob("*.txt"))
+
+
+def test_pinned_legacy_piper_kk_quality_gate_config() -> None:
+    root = Path(__file__).parents[1]
+    config = load_generator_config(
+        root / "configs/generation/generators/piper_kk_issai_high_legacy_1_2.yaml"
+    )
+    assert config.runtime["runtime_version"] == "1.2.0"
+    assert config.runtime["executable_sha256"] == (
+        "96f3da3811151580073e40bb4dd20eb0fb8115f5f5f76e2fb54282b3edfa5c1f"
+    )
+    assert config.selected_speaker_id == 0
+    assert config.generation_params == {
+        "noise_scale": 0.667,
+        "length_scale": 1.0,
+        "noise_w_scale": 0.8,
+        "speaker_id": 0,
+        "sentence_silence": 0.2,
+    }
 
 
 def test_real_piper_pilot_plan_has_exactly_ten_train_jobs(tmp_path: Path) -> None:

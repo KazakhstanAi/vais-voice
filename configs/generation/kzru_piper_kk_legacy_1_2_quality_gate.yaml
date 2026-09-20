@@ -1,0 +1,18 @@
+dataset_id: vais_kk_synthetic_piper_legacy_quality_gate
+dataset_version: v0.1
+project_root: ../..
+text_inventory: runs/piper-real-v01/text_inventory.jsonl
+output_dir: runs/piper-real-v01/plan-kk-legacy-1.2.0
+languages: [kk]
+max_texts_per_language: 5
+allowed_source_datasets: [fleurs_kk]
+allowed_generator_roles: [train]
+seed_strategy: none
+base_seed: 0
+output_format: wav
+output_sample_rate: null
+failure_policy: stop
+existing_output_policy: fail
+generators:
+  - config: generators/piper_kk_issai_high_legacy_1_2.yaml
+    enabled: true

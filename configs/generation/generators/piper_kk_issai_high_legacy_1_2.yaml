@@ -1,0 +1,66 @@
+adapter: piper
+provenance:
+  generator_id: G02_piper_kk_issai_high_legacy_1_2
+  display_name: Piper 1.2.0 kk_KZ-issai-high
+  family: Piper
+  provider: rhasspy
+  model_id: rhasspy/piper-voices/kk/kk_KZ/issai/high/kk_KZ-issai-high.onnx
+  model_revision: 320d5f7f7751a17ef6512d5c23863056c6a11c0f
+  model_version: kk_KZ-issai-high
+  languages: [kk]
+  license: null
+  license_url: https://huggingface.co/rhasspy/piper-voices/tree/320d5f7f7751a17ef6512d5c23863056c6a11c0f/kk/kk_KZ/issai/high
+  homepage_url: https://github.com/rhasspy/piper
+  model_url: https://huggingface.co/rhasspy/piper-voices/blob/320d5f7f7751a17ef6512d5c23863056c6a11c0f/kk/kk_KZ/issai/high/MODEL_CARD
+  citation: null
+  intended_role: train
+  commercial_use_status: needs_review
+  voice_repository: rhasspy/piper-voices
+  voice_repository_revision: 320d5f7f7751a17ef6512d5c23863056c6a11c0f
+  voice_repository_license: MIT
+  source_dataset: Kazakh_TTS
+  source_dataset_license: CC BY 4.0
+  source_dataset_license_url: https://creativecommons.org/licenses/by/4.0/
+  retrieved_at: "2026-09-20"
+  notes: Legacy runtime quality-gate candidate. Checkpoint license remains uncertain. Runtime bundle includes third-party components whose terms require separate review.
+runtime:
+  executable: ../../../runs/piper-real-v01/runtime/piper_windows_amd64/piper/piper.exe
+  executable_sha256: 96f3da3811151580073e40bb4dd20eb0fb8115f5f5f76e2fb54282b3edfa5c1f
+  entrypoint: standalone_binary
+  package: piper standalone Windows amd64 release
+  runtime_version: 1.2.0
+  runtime_license: MIT repository; bundled component terms apply
+  runtime_repository: rhasspy/piper
+  runtime_revision: v1.2.0
+  runtime_release_commit_abbrev: 36fec21
+  runtime_archive: piper_windows_amd64.zip
+  runtime_archive_sha256: f3c58906402b24f3a96d92145f58acba6d86c9b5db896d207f78dc80811efcea
+  model_path: ../../../runs/piper-real-v01/models/kk_KZ-issai-high.onnx
+  model_sha256: 4dee767c893e8535da821447d12cb030e3569e11254c14030a1da5d8b2222c16
+  model_config_sha256: eb145ac8712b87beda9f0266e95b98cad76acce89d4626cd8b1408234e9842f0
+voices: []
+voice_id: kk_KZ-issai-high
+speakers:
+  - speaker_id: 0
+    name: ISSAI_KazakhTTS2_M2
+  - speaker_id: 1
+    name: ISSAI_KazakhTTS_M1_Iseke
+  - speaker_id: 2
+    name: ISSAI_KazakhTTS2_F3
+  - speaker_id: 3
+    name: ISSAI_KazakhTTS_F1_Raya
+  - speaker_id: 4
+    name: ISSAI_KazakhTTS2_F1
+  - speaker_id: 5
+    name: ISSAI_KazakhTTS2_F2
+selected_speaker_id: 0
+selected_speaker_name: ISSAI_KazakhTTS2_M2
+generation_params:
+  noise_scale: 0.667
+  length_scale: 1.0
+  noise_w_scale: 0.8
+  speaker_id: 0
+  sentence_silence: 0.2
+supports_seed: false
+license_review_acknowledged: true
+verification_status: verified

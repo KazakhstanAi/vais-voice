@@ -1,8 +1,8 @@
 """Local Piper CLI integration with all executable/model details supplied by config."""
 
-import json
 import shutil
 import subprocess
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -91,6 +91,8 @@ class PiperGenerator(GeneratorAdapter):
         ]
         if voice_id is not None:
             command += ["--speaker", voice_id]
+        input_text: str | None = None
+        input_path: Path | None = None
         if self.config.runtime.get("entrypoint") == "python_module":
             cli_parameters = {
                 "noise_scale": "--noise-scale",
@@ -104,22 +106,41 @@ class PiperGenerator(GeneratorAdapter):
                     command += [flag, str(generation_params[name])]
             if generation_params.get("normalize_audio") is False:
                 command.append("--no-normalize")
-            input_text = text_item.text + "\n"
-        elif generation_params:
-            command += ["--json-input"]
-            input_text = json.dumps({"text": text_item.text, **generation_params}) + "\n"
+            with tempfile.NamedTemporaryFile(
+                mode="w",
+                encoding="utf-8",
+                suffix=".txt",
+                dir=output_path.parent,
+                delete=False,
+            ) as stream:
+                stream.write(text_item.text + "\n")
+                input_path = Path(stream.name)
+            command += ["--input-file", str(input_path)]
         else:
+            cli_parameters = {
+                "noise_scale": "--noise_scale",
+                "length_scale": "--length_scale",
+                "noise_w_scale": "--noise_w",
+                "sentence_silence": "--sentence_silence",
+            }
+            for name, flag in cli_parameters.items():
+                if name in generation_params:
+                    command += [flag, str(generation_params[name])]
             input_text = text_item.text + "\n"
-        completed = subprocess.run(
-            command,
-            input=input_text,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            capture_output=True,
-            timeout=600,
-            check=False,
-        )
+        try:
+            completed = subprocess.run(
+                command,
+                input=input_text,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                capture_output=True,
+                timeout=600,
+                check=False,
+            )
+        finally:
+            if input_path is not None:
+                input_path.unlink(missing_ok=True)
         if completed.returncode:
             output_path.unlink(missing_ok=True)
             raise RuntimeError(f"Piper failed: {completed.stderr.strip()}")
