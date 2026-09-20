@@ -10,6 +10,7 @@ columns:
   path: file
   speaker_id: speaker_id
   source_id: id
+  transcript: transcription
 metadata:
   source_id: fleurs_ru
   name: Google FLEURS Russian

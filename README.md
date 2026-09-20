@@ -2,9 +2,15 @@
 
 Reproducible KZ/RU synthetic speech detection and generation research infrastructure.
 
+Synthetic dataset v0.1 now provides provenance-aware text inventory, deterministic planning,
+resumable adapter execution, canonical manifests, and machine-readable reports. It does not train a
+detector or implement VAIS VoiceGen. See
+[`docs/synthetic-generation.md`](docs/synthetic-generation.md) for the protocol and commands.
+
 Исследование подлинности и генерации казахской, русской и смешанной речи.
 Сейчас это **инфраструктура, не SaaS и не готовая модель**. Нет реального benchmark,
-обучения, TTS, API или UI. Detection — Phase 1, VAIS VoiceGen — Phase 2.
+обучения детектора, VoiceGen, API или UI. Synthetic v0.1 создаёт исследовательские данные через
+настраиваемые внешние TTS-адаптеры; Detection — Phase 1, VAIS VoiceGen — Phase 2.
 
 ## Быстрый старт
 
@@ -50,7 +56,8 @@ Split: train.parquet, val.parquet, test.parquet и manifest.split.parquet ряд
 Training пока только preflight:
 `python -m vais_voice.train --config configs/detection/baseline.yaml --dry-run`.
 Без dry-run команда отказывается. Evaluate не загружает checkpoints.
-`python -m vais_voice.generation` честно сообщает об отсутствии VoiceGen.
+`python -m vais_voice.generation --help` показывает команды inventory/plan/run/report. Это pipeline
+датасета, а не VoiceGen.
 
 ## Schema и leakage
 
@@ -88,7 +95,7 @@ src/vais_voice/
   datasets/       # schema.py, manifest.py, split.py: logical dataset
   preprocessing/  # bounded decoding and resampling
   detection/      # Detector Protocol + explicit dummy
-  generation/     # GenerationNotImplementedError
+  generation/     # text inventory, generator adapters, plan/run/report
   evaluation/     # metrics and reports
   utils/          # paths, hashes, provenance
 scripts/

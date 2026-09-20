@@ -1,0 +1,24 @@
+dataset_id: vais_kzru_synthetic
+dataset_version: v0.1-pilot
+project_root: ../..
+text_inventory: data/manifests/local/kzru_real_v01_texts.jsonl
+output_dir: data/processed/generation-plans/kzru_synthetic_v01_pilot
+languages: [kk, ru]
+max_texts_per_language: 250
+allowed_source_datasets: [ksc2, fleurs_kk, fleurs_ru]
+allowed_generator_roles: [train]
+seed_strategy: per_job_hash
+base_seed: 20250901
+output_format: wav
+output_sample_rate: null
+failure_policy: continue
+existing_output_policy: skip
+generators:
+  - config: generators/silero_cis.yaml
+    enabled: true
+  - config: generators/piper.yaml
+    enabled: true
+  - config: generators/voxcpm_kazakh.yaml
+    enabled: true
+  - config: generators/qwen3_tts_ru.yaml
+    enabled: true

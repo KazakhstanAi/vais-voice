@@ -1,7 +1,6 @@
-
 """Canonical metadata. kk is ISO 639-1 for Kazakh."""
 
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -31,6 +30,16 @@ class Sample(BaseModel):
     duration_sec: float | None = Field(default=None, gt=0)
     attack_id: str | None = None
     source_record_id: str | None = None
+    transcript: str | None = None
+    normalized_text: str | None = None
+    text_id: str | None = Field(default=None, pattern=r"^[a-zA-Z0-9_-]+$")
+    source_text_id: str | None = Field(default=None, pattern=r"^[a-zA-Z0-9_-]+$")
+    generator_family: str | None = None
+    generator_version: str | None = None
+    voice_id: str | None = None
+    generation_seed: int | None = None
+    generation_params: dict[str, Any] | None = None
+    intended_role: Literal["train", "validation", "unseen_test", "external_challenge"] | None = None
     missing_metadata: list[str] = Field(default_factory=list)
 
     @field_validator("related_speaker_ids")
@@ -53,6 +62,20 @@ class Sample(BaseModel):
             raise ValueError("Synthetic samples require generator_id family/version")
         if self.label == "real" and self.generator_id is not None:
             raise ValueError("Real samples must have generator_id=null")
+        if self.label == "real" and any(
+            value is not None
+            for value in (
+                self.generator_family,
+                self.generator_version,
+                self.voice_id,
+                self.generation_seed,
+                self.generation_params,
+                self.intended_role,
+            )
+        ):
+            raise ValueError("Real samples must not carry generator metadata")
+        if self.source_text_id and self.text_id and self.source_text_id != self.text_id:
+            raise ValueError("text_id and source_text_id must identify the same text")
         if self.parent_sample_id == self.sample_id:
             raise ValueError("A sample cannot be its own parent")
         return self

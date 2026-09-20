@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from vais_voice.datasets.adapters import adapter_from_config
 from vais_voice.datasets.adapters.base import AdaptedSample
 from vais_voice.datasets.manifest import validate_rows, write_manifest
+from vais_voice.datasets.roles import ResearchPartition, validate_generator_roles
 from vais_voice.preprocessing.audio import preprocess
 from vais_voice.utils.io import load_yaml, sha256, write_json
 from vais_voice.utils.tracking import snapshot
@@ -43,6 +44,7 @@ class DatasetBuildConfig(BaseModel):
     sample_rate: int = Field(default=16000, ge=8000, le=96000)
     max_duration_seconds: float = Field(default=120, gt=0, le=3600)
     max_file_bytes: int = Field(default=52428800, gt=0, le=1073741824)
+    research_partition: ResearchPartition = "train"
 
 
 def _limited(samples: list[AdaptedSample], source: SourceBuild) -> list[AdaptedSample]:
@@ -114,6 +116,7 @@ def build_dataset(config_path: Path) -> Path:
     if not selected:
         raise ValueError("Dataset build selected no samples")
     validate_rows([item.row.model_dump(mode="json") for item in selected])
+    validate_generator_roles([item.row for item in selected], config.research_partition)
 
     hashes: dict[str, list[str]] = defaultdict(list)
     for item in selected:

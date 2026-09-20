@@ -1,0 +1,26 @@
+adapter: fake_sine
+provenance:
+  generator_id: infrastructure_fake_sine
+  display_name: Deterministic sine fixture
+  family: infrastructure_test_only
+  provider: VAIS test suite
+  model_id: null
+  model_revision: null
+  model_version: "1"
+  languages: [kk, ru]
+  license: MIT
+  license_url: https://opensource.org/license/mit
+  homepage_url: null
+  model_url: null
+  citation: null
+  intended_role: train
+  commercial_use_status: permissive
+  notes: Not speech, not a TTS system, and never a benchmark generator.
+runtime: {}
+voices: [fixture]
+generation_params:
+  duration_sec: 0.08
+  sample_rate: 16000
+supports_seed: true
+license_review_acknowledged: true
+verification_status: infrastructure_test_only

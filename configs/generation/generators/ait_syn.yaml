@@ -1,0 +1,23 @@
+adapter: ait_syn
+provenance:
+  generator_id: C01_ait_syn
+  display_name: AIT-Syn
+  family: AIT-Syn
+  provider: TODO
+  model_id: null
+  model_revision: null
+  model_version: null
+  languages: [kk, ru]
+  license: null
+  license_url: null
+  homepage_url: null
+  model_url: null
+  citation: null
+  intended_role: external_challenge
+  commercial_use_status: needs_review
+  notes: External challenge only; identity, acquisition, runtime, and terms require verification.
+runtime: {}
+voices: []
+generation_params: {}
+license_review_acknowledged: false
+verification_status: runtime_unverified

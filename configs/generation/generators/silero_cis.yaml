@@ -1,0 +1,23 @@
+adapter: silero
+provenance:
+  generator_id: G01_silero_cis
+  display_name: Silero CIS
+  family: Silero
+  provider: Silero
+  model_id: null
+  model_revision: null
+  model_version: null
+  languages: [kk, ru]
+  license: null
+  license_url: null
+  homepage_url: https://github.com/snakers4/silero-models
+  model_url: null
+  citation: null
+  intended_role: train
+  commercial_use_status: needs_review
+  notes: Checkpoint identity, revision, voice list, runtime API, and model-specific terms are TODO before generation.
+runtime: {}
+voices: []
+generation_params: {}
+license_review_acknowledged: false
+verification_status: runtime_unverified

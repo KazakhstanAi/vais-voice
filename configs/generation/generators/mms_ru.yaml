@@ -1,0 +1,23 @@
+adapter: mms
+provenance:
+  generator_id: U01_mms_ru
+  display_name: Meta MMS-TTS Russian
+  family: MMS-TTS
+  provider: Meta
+  model_id: null
+  model_revision: null
+  model_version: null
+  languages: [ru]
+  license: null
+  license_url: null
+  homepage_url: null
+  model_url: null
+  citation: null
+  intended_role: unseen_test
+  commercial_use_status: needs_review
+  notes: Protected generator; checkpoint and license must be pinned and reviewed.
+runtime: {}
+voices: []
+generation_params: {}
+license_review_acknowledged: false
+verification_status: runtime_unverified

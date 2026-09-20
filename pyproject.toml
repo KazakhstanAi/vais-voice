@@ -24,6 +24,14 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest==8.4.2", "pytest-cov==6.2.1", "ruff==0.12.12"]
 ml = ["torch", "torchaudio"]
+# Heavy model runtimes are installed and pinned in reviewed, model-specific environments.
+generation-silero = []
+generation-piper = []
+generation-voxcpm = []
+generation-qwen = []
+generation-mms = []
+generation-omnivoice = []
+generation-ait = []
 
 [project.scripts]
 vais-voice = "vais_voice.data.cli:main"

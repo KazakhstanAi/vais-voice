@@ -1,0 +1,23 @@
+adapter: qwen3_tts
+provenance:
+  generator_id: G04_qwen3_tts_ru
+  display_name: Qwen3-TTS Russian
+  family: Qwen3-TTS
+  provider: Qwen
+  model_id: null
+  model_revision: null
+  model_version: null
+  languages: [ru]
+  license: null
+  license_url: null
+  homepage_url: null
+  model_url: null
+  citation: null
+  intended_role: train
+  commercial_use_status: needs_review
+  notes: Exact checkpoint/API/runtime and terms are deliberately unasserted.
+runtime: {}
+voices: []
+generation_params: {}
+license_review_acknowledged: false
+verification_status: runtime_unverified

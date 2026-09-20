@@ -1,0 +1,25 @@
+adapter: piper
+provenance:
+  generator_id: G02_piper
+  display_name: Piper
+  family: Piper
+  provider: rhasspy/OHF-Voice
+  model_id: null
+  model_revision: null
+  model_version: null
+  languages: [kk, ru]
+  license: null
+  license_url: null
+  homepage_url: https://github.com/rhasspy/piper
+  model_url: null
+  citation: null
+  intended_role: train
+  commercial_use_status: needs_review
+  notes: Configure and review each voice model separately; engine visibility does not establish voice-model rights.
+runtime:
+  executable: piper
+  model_path: ""
+voices: []
+generation_params: {}
+license_review_acknowledged: false
+verification_status: runtime_unverified

@@ -10,6 +10,7 @@ from vais_voice.datasets.adapters.base import (
     read_table,
 )
 from vais_voice.datasets.schema import Sample
+from vais_voice.datasets.text import normalize_text, text_identity
 from vais_voice.preprocessing.audio import SUPPORTED
 
 
@@ -17,11 +18,22 @@ class KSC2Adapter(DatasetAdapter):
     def read_records(self, audio_root: Path) -> list[dict]:
         if self.config.metadata_file:
             return read_table(self.source_file(self.config.metadata_file), self.config.delimiter)
-        return [
-            {"path": path.relative_to(audio_root).as_posix()}
-            for path in sorted(audio_root.rglob("*"))
-            if path.suffix.lower() in SUPPORTED
-        ]
+        records = []
+        for path in sorted(audio_root.rglob("*")):
+            if path.suffix.lower() not in SUPPORTED:
+                continue
+            sidecar = path.with_suffix(".txt")
+            records.append(
+                {
+                    "path": path.relative_to(audio_root).as_posix(),
+                    "transcript": (
+                        sidecar.read_text(encoding="utf-8-sig").strip()
+                        if sidecar.is_file()
+                        else None
+                    ),
+                }
+            )
+        return records
 
     def iter_samples(self) -> list[AdaptedSample]:
         self.validate()
@@ -34,6 +46,7 @@ class KSC2Adapter(DatasetAdapter):
             "speaker_id": "speaker_id",
             "source_id": "source_id",
             "language": "language",
+            "transcript": "transcript",
             **self.config.columns,
         }
         result = []
@@ -59,6 +72,8 @@ class KSC2Adapter(DatasetAdapter):
                 raise ValueError(f"Unsupported KSC2 language {raw_language!r} in row {number}")
             speaker = str(record.get(columns["speaker_id"]) or f"unknown_{sample_id}")
             missing = [] if record.get(columns["speaker_id"]) else ["speaker_id"]
+            transcript = str(record.get(columns["transcript"]) or "").strip() or None
+            normalized = normalize_text(transcript) if transcript else None
             result.append(
                 AdaptedSample(
                     Sample(
@@ -77,6 +92,9 @@ class KSC2Adapter(DatasetAdapter):
                         or "configured source metadata",
                         usage_permission="approved",
                         source_record_id=record_id,
+                        transcript=transcript,
+                        normalized_text=normalized,
+                        text_id=text_identity(language, normalized) if normalized else None,
                         missing_metadata=missing,
                         **inspect_audio(source),
                     ),

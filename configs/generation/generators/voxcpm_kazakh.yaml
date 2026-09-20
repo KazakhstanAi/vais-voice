@@ -1,0 +1,23 @@
+adapter: voxcpm
+provenance:
+  generator_id: G03_voxcpm_kazakh
+  display_name: VoxCPM Kazakh adaptation
+  family: VoxCPM
+  provider: TODO
+  model_id: null
+  model_revision: null
+  model_version: null
+  languages: [kk]
+  license: null
+  license_url: null
+  homepage_url: null
+  model_url: null
+  citation: null
+  intended_role: train
+  commercial_use_status: needs_review
+  notes: Exact adaptation and all upstream metadata require verification.
+runtime: {}
+voices: []
+generation_params: {}
+license_review_acknowledged: false
+verification_status: runtime_unverified

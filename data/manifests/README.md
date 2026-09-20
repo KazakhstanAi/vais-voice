@@ -26,7 +26,13 @@ Paths are relative to raw root before preparation, manifest directory afterwards
 | source_sha256, processed_sha256 | Computed integrity hashes |
 | attack_id | Optional ASVspoof attack/system identifier |
 | source_record_id | Optional verbatim source-side record identifier |
+| transcript, normalized_text | Optional source text and its stable normalized form |
+| text_id, source_text_id | Shared text identity; all variants stay in one protected split |
+| generator_family, generator_version | Synthetic generator provenance |
+| voice_id, generation_seed, generation_params | Synthetic generation inputs/capabilities |
+| intended_role | train / validation / unseen_test / external_challenge |
 | missing_metadata | Explicit names of unavailable metadata fields |
 
 No derivatives or speakers cross splits. Explicit unseen generators never enter train/val.
+Text identities cannot cross splits. External-challenge generators remain a separate partition.
 Approval metadata does not replace rights review. Private manifests belong in ignored local/.

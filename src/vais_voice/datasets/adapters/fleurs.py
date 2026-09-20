@@ -31,6 +31,7 @@ class FleursAdapter(KSC2Adapter):
                     "file": filename,
                     "raw_transcription": raw_text,
                     "transcription": text,
+                    "transcript": text,
                     "num_samples": num_samples,
                     "gender": gender,
                 }

@@ -23,6 +23,9 @@ def connected_groups(rows: list[Sample]) -> list[list[int]]:
             tokens.append(f"sample:{row.parent_sample_id}")
         if row.source_sha256:
             tokens.append(f"hash:{row.source_sha256}")
+        text_id = row.source_text_id or row.text_id
+        if text_id:
+            tokens.append(f"text:{text_id}")
         for token in tokens:
             if token in owners:
                 parent[find(i)] = find(owners[token])
@@ -55,7 +58,9 @@ def assign_splits(
         if all(supplied):
             splits = {rows[i].split for i in group}
             if len(splits) != 1:
-                raise ValueError("Speaker/source/parent/duplicate leakage across supplied splits")
+                raise ValueError(
+                    "Speaker/source/parent/text/duplicate leakage across supplied splits"
+                )
             split = rows[group[0]].split
             if holdout and split != "test":
                 raise ValueError("Unseen generator_id component must be in test")
@@ -74,6 +79,20 @@ def assign_splits(
             )
         for i in group:
             result[i] = rows[i].model_copy(update={"split": split})
+    for row in result:
+        if row.label != "synthetic" or row.intended_role is None:
+            continue
+        allowed = {
+            "train": {"train"},
+            "val": {"train", "validation"},
+            "test": {"train", "validation", "unseen_test"},
+        }[row.split]
+        if row.intended_role == "external_challenge":
+            raise ValueError("External challenge data must remain outside ordinary dataset splits")
+        if row.intended_role not in allowed:
+            raise ValueError(
+                f"Generator role {row.intended_role!r} is not allowed in {row.split!r} split"
+            )
     for split in ("train", "val", "test"):
         labels = {row.label for row in result if row.split == split}
         if labels != {"real", "synthetic"}:

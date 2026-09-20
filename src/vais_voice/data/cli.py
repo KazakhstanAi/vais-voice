@@ -13,6 +13,7 @@ def main() -> None:
         "evaluate": "evaluate",
         "train": "train",
         "doctor": "doctor",
+        "generation": "generation.__main__",
     }
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=modules)

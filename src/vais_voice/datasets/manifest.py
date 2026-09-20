@@ -52,13 +52,13 @@ def read_manifest(path: Path) -> list[Sample]:
     return validate_rows(records)
 
 
-def write_manifest(path: Path, rows: list[Sample]) -> None:
+def write_manifest(path: Path, rows: list[Sample], *, overwrite: bool = False) -> None:
     records = [row.model_dump(mode="json") for row in rows]
     if path.suffix == ".parquet":
-        with path.open("xb") as stream:
+        with path.open("wb" if overwrite else "xb") as stream:
             pd.DataFrame(records).to_parquet(stream, index=False)
     elif path.suffix == ".jsonl":
-        with path.open("x", encoding="utf-8") as stream:
+        with path.open("w" if overwrite else "x", encoding="utf-8") as stream:
             for record in records:
                 stream.write(json.dumps(record, ensure_ascii=False) + "\n")
     else:

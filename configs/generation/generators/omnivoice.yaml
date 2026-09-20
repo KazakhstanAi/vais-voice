@@ -1,0 +1,23 @@
+adapter: omnivoice
+provenance:
+  generator_id: U02_omnivoice
+  display_name: OmniVoice
+  family: OmniVoice
+  provider: TODO
+  model_id: null
+  model_revision: null
+  model_version: null
+  languages: [kk, ru]
+  license: null
+  license_url: null
+  homepage_url: null
+  model_url: null
+  citation: null
+  intended_role: unseen_test
+  commercial_use_status: needs_review
+  notes: Protected generator; exact project/checkpoint/runtime/terms require verification.
+runtime: {}
+voices: []
+generation_params: {}
+license_review_acknowledged: false
+verification_status: runtime_unverified

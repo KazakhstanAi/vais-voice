@@ -1,9 +1,5 @@
-"""VAIS Voice research infrastructure."""
+"""Reproducible synthetic-speech dataset generation infrastructure."""
 
+from vais_voice.generation.models import GeneratorConfig, GeneratorProvenance, TextItem
 
-class GenerationNotImplementedError(NotImplementedError):
-    pass
-
-
-def generate() -> None:
-    raise GenerationNotImplementedError("VAIS VoiceGen is not implemented in v0.1.")
+__all__ = ["GeneratorConfig", "GeneratorProvenance", "TextItem"]
