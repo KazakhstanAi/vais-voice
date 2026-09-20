@@ -8,7 +8,14 @@ from vais_voice.utils.io import load_yaml
 
 
 def load_generator_config(path: Path) -> GeneratorConfig:
-    return GeneratorConfig.model_validate(load_yaml(path))
+    config = GeneratorConfig.model_validate(load_yaml(path))
+    runtime = dict(config.runtime)
+    for key in ("executable", "model_path"):
+        value = str(runtime.get(key, ""))
+        candidate = Path(value)
+        if value and not candidate.is_absolute() and ("/" in value or "\\" in value):
+            runtime[key] = str((path.parent / candidate).resolve())
+    return config.model_copy(update={"runtime": runtime})
 
 
 def adapter_from_config(config: GeneratorConfig) -> GeneratorAdapter:

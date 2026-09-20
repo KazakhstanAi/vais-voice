@@ -66,7 +66,7 @@ def _manifest_rows(
                 path=job.output_relative_path,
                 label="synthetic",
                 language=job.language,
-                speaker_id=job.voice_id or f"{job.generator_id}_default",
+                speaker_id=job.speaker_name or job.voice_id or f"{job.generator_id}_default",
                 source_dataset=item.source_dataset,
                 source_id=job.job_id,
                 generator_id=job.generator_id,
@@ -90,6 +90,8 @@ def _manifest_rows(
                 generator_family=provenance.family,
                 generator_version=version,
                 voice_id=job.voice_id,
+                generator_speaker_id=job.speaker_id,
+                generator_speaker_name=job.speaker_name,
                 generation_seed=job.seed,
                 generation_params=job.generation_params,
                 intended_role=job.intended_role,
@@ -150,8 +152,15 @@ def run_plan(
         adapter = adapters.setdefault(job.generator_id, adapter_from_config(config))
         try:
             adapter.validate_runtime()
+            runtime_voice = job.voice_id
+            if config.adapter == "piper":
+                runtime_voice = str(job.speaker_id) if job.speaker_id is not None else None
             generated = adapter.synthesize(
-                texts[job.text_id], output, job.voice_id, job.seed, job.generation_params
+                texts[job.text_id],
+                output,
+                runtime_voice,
+                job.seed,
+                job.generation_params,
             )
             completed = generated.model_copy(
                 update={"job_id": job.job_id, "output_relative_path": job.output_relative_path}

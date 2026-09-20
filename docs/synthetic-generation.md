@@ -76,6 +76,15 @@ not speech and exists only to test infrastructure offline.
 5. Install heavyweight or CUDA-sensitive dependencies in a model-specific reviewed environment.
 
 Silero, VoxCPM, Qwen3-TTS, MMS, OmniVoice, and AIT-Syn currently have explicit runtime-unverified
-boundaries. Piper has a local CLI integration, but requires a reviewed voice model path and installed
-executable. Model-specific environments are intentionally not base dependencies.
+boundaries. Piper has a local CLI integration. The pinned Windows pilot configs for
+`kk_KZ-issai-high` and `ru_RU-dmitri-medium` were verified with `piper-tts==1.8.0` in a dedicated
+environment; their runtime and model paths point into the ignored `runs/piper-real-v01/` directory
+and are guarded by SHA-256. Re-download those exact pinned artifacts before reproducing on a new
+checkout. Piper is exposed through the `generation-piper` optional dependency and is intentionally
+not a base dependency.
 
+The current Piper runtime package is GPL-3.0-or-later, while the pinned voice repository revision is
+MIT. The selected model cards identify CC BY 4.0 Kazakh source data and CC0 Russian source data, but
+do not state an unambiguous license for the resulting checkpoints. The configs therefore keep the
+checkpoint license explicitly unknown and retain `commercial_use_status: needs_review`; this pilot
+is a research generation run, not a commercial-clearance decision.

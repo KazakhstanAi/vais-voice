@@ -26,6 +26,13 @@ class GeneratorProvenance(BaseModel):
     citation: str | None = None
     intended_role: GeneratorRole
     commercial_use_status: CommercialStatus
+    voice_repository: str | None = None
+    voice_repository_revision: str | None = None
+    voice_repository_license: str | None = None
+    source_dataset: str | None = None
+    source_dataset_license: str | None = None
+    source_dataset_license_url: str | None = None
+    retrieved_at: str | None = None
     notes: str | None = None
 
     @field_validator("languages")
@@ -36,6 +43,13 @@ class GeneratorProvenance(BaseModel):
         return value
 
 
+class GeneratorSpeaker(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    speaker_id: int = Field(ge=0)
+    name: str = Field(min_length=1)
+
+
 class GeneratorConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -43,6 +57,10 @@ class GeneratorConfig(BaseModel):
     provenance: GeneratorProvenance
     runtime: dict[str, Any] = Field(default_factory=dict)
     voices: list[str] = Field(default_factory=list)
+    voice_id: str | None = None
+    speakers: list[GeneratorSpeaker] = Field(default_factory=list)
+    selected_speaker_id: int | None = Field(default=None, ge=0)
+    selected_speaker_name: str | None = None
     generation_params: dict[str, Any] = Field(default_factory=dict)
     supports_seed: bool = False
     license_review_acknowledged: bool = False
@@ -54,6 +72,14 @@ class GeneratorConfig(BaseModel):
             self.verification_status == "infrastructure_test_only"
         ):
             raise ValueError("fake_sine is the only infrastructure_test_only adapter")
+        selected = [
+            speaker for speaker in self.speakers if speaker.speaker_id == self.selected_speaker_id
+        ]
+        if self.selected_speaker_id is not None:
+            if len(selected) != 1 or selected[0].name != self.selected_speaker_name:
+                raise ValueError("Selected speaker ID/name must match the configured speaker map")
+        elif self.selected_speaker_name is not None:
+            raise ValueError("selected_speaker_name requires selected_speaker_id")
         return self
 
     def require_generation_approval(self) -> None:
@@ -91,6 +117,8 @@ class GenerationJob(BaseModel):
     generator_id: str
     language: Literal["kk", "ru"]
     voice_id: str | None = None
+    speaker_id: int | None = Field(default=None, ge=0)
+    speaker_name: str | None = None
     seed: int | None = Field(default=None, ge=0)
     generation_params: dict[str, Any] = Field(default_factory=dict)
     intended_role: GeneratorRole
@@ -109,3 +137,17 @@ class GenerationResult(BaseModel):
     codec: str | None = None
     error: str | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class PronunciationReviewItem(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    sample_id: str
+    language: Literal["kk", "ru"]
+    source_text: str
+    voice: str
+    speaker: str
+    speaker_id: int | None = Field(default=None, ge=0)
+    audio_path: str
+    review_status: Literal["pending", "pass", "warning", "fail"] = "pending"
+    review_notes: str = ""

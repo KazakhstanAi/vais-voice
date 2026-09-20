@@ -41,6 +41,10 @@ def read_manifest(path: Path) -> list[Sample]:
         raise ValueError(f"Manifest not found: {path}. No dataset is downloaded automatically.")
     if path.suffix == ".parquet":
         records = json.loads(pd.read_parquet(path).to_json(orient="records"))
+        for record in records:
+            params = record.get("generation_params")
+            if isinstance(params, str):
+                record["generation_params"] = json.loads(params)
     elif path.suffix == ".jsonl":
         records = [
             json.loads(line)
@@ -55,8 +59,19 @@ def read_manifest(path: Path) -> list[Sample]:
 def write_manifest(path: Path, rows: list[Sample], *, overwrite: bool = False) -> None:
     records = [row.model_dump(mode="json") for row in rows]
     if path.suffix == ".parquet":
+        parquet_records = []
+        for record in records:
+            parquet_record = dict(record)
+            if isinstance(parquet_record.get("generation_params"), dict):
+                parquet_record["generation_params"] = json.dumps(
+                    parquet_record["generation_params"],
+                    ensure_ascii=False,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                )
+            parquet_records.append(parquet_record)
         with path.open("wb" if overwrite else "xb") as stream:
-            pd.DataFrame(records).to_parquet(stream, index=False)
+            pd.DataFrame(parquet_records).to_parquet(stream, index=False)
     elif path.suffix == ".jsonl":
         with path.open("w" if overwrite else "x", encoding="utf-8") as stream:
             for record in records:

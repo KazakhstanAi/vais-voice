@@ -112,7 +112,9 @@ def create_plan(config_path: Path) -> Path:
         generator_configs[provenance.generator_id] = generator.model_dump(mode="json")
         generator_hashes[provenance.generator_id] = sha256(generator_path)
         voices = entry.voices if entry.voices is not None else generator.voices
-        voice_options: list[str | None] = voices or [None]
+        voice_options: list[str | None] = (
+            [generator.voice_id] if generator.voice_id else voices or [None]
+        )
         unknown = set(voices) - set(generator.voices)
         if unknown:
             raise ValueError(f"Unknown voices for {provenance.generator_id}: {sorted(unknown)}")
@@ -132,6 +134,8 @@ def create_plan(config_path: Path) -> Path:
                     "model_version": provenance.model_version,
                     "language": item.language,
                     "voice_id": voice,
+                    "speaker_id": generator.selected_speaker_id,
+                    "speaker_name": generator.selected_speaker_name,
                     "generation_params": params,
                     "intended_role": provenance.intended_role,
                 }
@@ -149,6 +153,8 @@ def create_plan(config_path: Path) -> Path:
                         generator_id=provenance.generator_id,
                         language=item.language,
                         voice_id=voice,
+                        speaker_id=generator.selected_speaker_id,
+                        speaker_name=generator.selected_speaker_name,
                         seed=seed,
                         generation_params=params,
                         intended_role=provenance.intended_role,

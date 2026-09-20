@@ -4,7 +4,12 @@ import json
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from vais_voice.generation.models import GenerationResult, GeneratorConfig
+from vais_voice.generation.models import (
+    GenerationResult,
+    GeneratorConfig,
+    PronunciationReviewItem,
+    TextItem,
+)
 from vais_voice.generation.plan import read_jobs
 from vais_voice.utils.io import contained_path, sha256, write_json
 
@@ -36,11 +41,16 @@ def build_report(run_dir: Path) -> Path:
         key: GeneratorConfig.model_validate(value)
         for key, value in plan_metadata["generator_configs"].items()
     }
+    texts = {
+        item.text_id: item for item in map(TextItem.model_validate, plan_metadata["text_items"])
+    }
     dimensions = {
         "language": Counter(),
         "generator": Counter(),
         "generator_family": Counter(),
         "voice_id": Counter(),
+        "speaker_id": Counter(),
+        "speaker_name": Counter(),
         "intended_role": Counter(),
     }
     durations = {key: defaultdict(float) for key in dimensions}
@@ -48,6 +58,7 @@ def build_report(run_dir: Path) -> Path:
     total_duration = 0.0
     valid_statuses = Counter()
     generated_text_ids = set()
+    valid_job_ids = set()
     for job in jobs:
         result = results.get(job.job_id)
         if not result or result.status not in {"completed", "skipped"}:
@@ -64,6 +75,7 @@ def build_report(run_dir: Path) -> Path:
             valid_statuses["failed"] += 1
             continue
         valid_statuses[result.status] += 1
+        valid_job_ids.add(job.job_id)
         generated_text_ids.add(job.text_id)
         duration = result.duration_sec or 0.0
         total_duration += duration
@@ -72,6 +84,8 @@ def build_report(run_dir: Path) -> Path:
             "generator": job.generator_id,
             "generator_family": configs[job.generator_id].provenance.family,
             "voice_id": job.voice_id or "default",
+            "speaker_id": str(job.speaker_id) if job.speaker_id is not None else "default",
+            "speaker_name": job.speaker_name or "default",
             "intended_role": job.intended_role,
         }
         for key, value in values.items():
@@ -81,6 +95,36 @@ def build_report(run_dir: Path) -> Path:
         codecs[result.codec or "unknown"] += 1
         if result.output_sha256:
             hashes[result.output_sha256].append(job.job_id)
+    review_path = run_dir / "pronunciation_review.jsonl"
+    review_items = [
+        PronunciationReviewItem(
+            sample_id=f"synth_{job.job_id}",
+            language=job.language,
+            source_text=texts[job.text_id].text,
+            voice=job.voice_id or job.generator_id,
+            speaker=job.speaker_name or "single-speaker/default",
+            speaker_id=job.speaker_id,
+            audio_path=job.output_relative_path,
+        )
+        for job in jobs
+        if job.job_id in valid_job_ids
+    ]
+    if not review_path.exists():
+        with review_path.open("x", encoding="utf-8") as stream:
+            for item in review_items:
+                stream.write(json.dumps(item.model_dump(mode="json"), ensure_ascii=False) + "\n")
+    else:
+        existing_review = [
+            PronunciationReviewItem.model_validate(json.loads(line))
+            for line in review_path.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        if {item.sample_id for item in existing_review} != {
+            item.sample_id for item in review_items
+        }:
+            raise ValueError("Pronunciation review artifact does not match this run")
+        review_items = existing_review
+
     report = {
         "dataset_id": plan_metadata["dataset_id"],
         "dataset_version": plan_metadata["dataset_version"],
@@ -88,6 +132,20 @@ def build_report(run_dir: Path) -> Path:
         "text_inventory_hash": snapshot["text_inventory_sha256"],
         "generator_configs": plan_metadata["generator_configs"],
         "generator_config_hashes": snapshot["generator_config_hashes"],
+        "runtime": {key: value.runtime for key, value in sorted(configs.items())},
+        "voice_models": {
+            key: {
+                "voice_id": value.voice_id,
+                "model_id": value.provenance.model_id,
+                "model_revision": value.provenance.model_revision,
+                "model_sha256": value.runtime.get("model_sha256"),
+                "model_config_sha256": value.runtime.get("model_config_sha256"),
+            }
+            for key, value in sorted(configs.items())
+        },
+        "generation_parameters": {
+            key: value.generation_params for key, value in sorted(configs.items())
+        },
         "number_of_planned_jobs": len(jobs),
         "number_completed": valid_statuses["completed"],
         "number_skipped": valid_statuses["skipped"],
@@ -100,8 +158,21 @@ def build_report(run_dir: Path) -> Path:
         "output_codec_distribution": dict(sorted(codecs.items())),
         "failure_reasons": dict(sorted(errors.items())),
         "duplicate_hashes": {digest: ids for digest, ids in sorted(hashes.items()) if len(ids) > 1},
+        "output_hashes": {
+            job.job_id: results[job.job_id].output_sha256
+            for job in jobs
+            if job.job_id in valid_job_ids
+        },
         "provenance_snapshot": snapshot,
         "source_text_count": len(generated_text_ids),
+        "pronunciation_review": {
+            "path": review_path.name,
+            "sha256": sha256(review_path),
+            "status_counts": {
+                status: sum(item.review_status == status for item in review_items)
+                for status in ("pending", "pass", "warning", "fail")
+            },
+        },
     }
     path = run_dir / "generation_report.json"
     if path.exists():

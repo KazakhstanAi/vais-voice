@@ -1,0 +1,68 @@
+adapter: piper
+provenance:
+  generator_id: G02_piper_kk_issai_high
+  display_name: Piper kk_KZ-issai-high
+  family: Piper
+  provider: rhasspy
+  model_id: rhasspy/piper-voices/kk/kk_KZ/issai/high/kk_KZ-issai-high.onnx
+  model_revision: 320d5f7f7751a17ef6512d5c23863056c6a11c0f
+  model_version: kk_KZ-issai-high
+  languages: [kk]
+  license: null
+  license_url: https://huggingface.co/rhasspy/piper-voices/tree/320d5f7f7751a17ef6512d5c23863056c6a11c0f/kk/kk_KZ/issai/high
+  homepage_url: https://github.com/rhasspy/piper
+  model_url: https://huggingface.co/rhasspy/piper-voices/blob/320d5f7f7751a17ef6512d5c23863056c6a11c0f/kk/kk_KZ/issai/high/MODEL_CARD
+  citation: null
+  intended_role: train
+  commercial_use_status: needs_review
+  voice_repository: rhasspy/piper-voices
+  voice_repository_revision: 320d5f7f7751a17ef6512d5c23863056c6a11c0f
+  voice_repository_license: MIT
+  source_dataset: Kazakh_TTS
+  source_dataset_license: CC BY 4.0
+  source_dataset_license_url: https://creativecommons.org/licenses/by/4.0/
+  retrieved_at: "2026-09-20"
+  notes: Model card says 6 speakers, 22050 Hz, trained from scratch on Kazakh_TTS under CC BY 4.0. Runtime bundle includes eSpeak NG; redistribution licensing needs separate review.
+runtime:
+  executable: ../../../runs/piper-real-v01/venv-1.8.0/Scripts/python.exe
+  executable_sha256: 35b4bd456823c5ea3aba0856b95e113da92d5362a6fa7643f12aef9cc1a1875b
+  entrypoint: python_module
+  module: piper
+  package: piper-tts
+  runtime_version: 1.8.0
+  runtime_license: GPL-3.0-or-later
+  runtime_repository: OHF-Voice/piper1-gpl
+  runtime_revision: 639388b6317fc4731e91d53da42aea68fd4166ff
+  runtime_wheel: piper_tts-1.8.0-cp39-abi3-win_amd64.whl
+  runtime_wheel_sha256: 5da9bfdb05dfe15da3536859d422e605483ffa6d2b3ec2c5b9593bae6b5aa6a4
+  model_path: ../../../runs/piper-real-v01/models/kk_KZ-issai-high.onnx
+  model_sha256: 4dee767c893e8535da821447d12cb030e3569e11254c14030a1da5d8b2222c16
+  model_config_sha256: eb145ac8712b87beda9f0266e95b98cad76acce89d4626cd8b1408234e9842f0
+voices: []
+voice_id: kk_KZ-issai-high
+speakers:
+  - speaker_id: 0
+    name: ISSAI_KazakhTTS2_M2
+  - speaker_id: 1
+    name: ISSAI_KazakhTTS_M1_Iseke
+  - speaker_id: 2
+    name: ISSAI_KazakhTTS2_F3
+  - speaker_id: 3
+    name: ISSAI_KazakhTTS_F1_Raya
+  - speaker_id: 4
+    name: ISSAI_KazakhTTS2_F1
+  - speaker_id: 5
+    name: ISSAI_KazakhTTS2_F2
+selected_speaker_id: 0
+selected_speaker_name: ISSAI_KazakhTTS2_M2
+generation_params:
+  noise_scale: 0.667
+  length_scale: 1.0
+  noise_w_scale: 0.8
+  speaker_id: 0
+  normalize_audio: false
+  volume: 1.0
+  sentence_silence: 0.0
+supports_seed: false
+license_review_acknowledged: true
+verification_status: verified

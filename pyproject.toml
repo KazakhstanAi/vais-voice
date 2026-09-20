@@ -26,7 +26,7 @@ dev = ["pytest==8.4.2", "pytest-cov==6.2.1", "ruff==0.12.12"]
 ml = ["torch", "torchaudio"]
 # Heavy model runtimes are installed and pinned in reviewed, model-specific environments.
 generation-silero = []
-generation-piper = []
+generation-piper = ["piper-tts==1.8.0"]
 generation-voxcpm = []
 generation-qwen = []
 generation-mms = []

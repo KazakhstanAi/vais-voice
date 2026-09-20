@@ -37,6 +37,8 @@ class Sample(BaseModel):
     generator_family: str | None = None
     generator_version: str | None = None
     voice_id: str | None = None
+    generator_speaker_id: int | None = Field(default=None, ge=0)
+    generator_speaker_name: str | None = None
     generation_seed: int | None = None
     generation_params: dict[str, Any] | None = None
     intended_role: Literal["train", "validation", "unseen_test", "external_challenge"] | None = None
@@ -68,6 +70,8 @@ class Sample(BaseModel):
                 self.generator_family,
                 self.generator_version,
                 self.voice_id,
+                self.generator_speaker_id,
+                self.generator_speaker_name,
                 self.generation_seed,
                 self.generation_params,
                 self.intended_role,

@@ -1,0 +1,55 @@
+adapter: piper
+provenance:
+  generator_id: G02_piper_ru_dmitri_medium
+  display_name: Piper ru_RU-dmitri-medium
+  family: Piper
+  provider: rhasspy
+  model_id: rhasspy/piper-voices/ru/ru_RU/dmitri/medium/ru_RU-dmitri-medium.onnx
+  model_revision: 320d5f7f7751a17ef6512d5c23863056c6a11c0f
+  model_version: ru_RU-dmitri-medium
+  languages: [ru]
+  license: null
+  license_url: https://huggingface.co/rhasspy/piper-voices/tree/320d5f7f7751a17ef6512d5c23863056c6a11c0f/ru/ru_RU/dmitri/medium
+  homepage_url: https://github.com/rhasspy/piper
+  model_url: https://huggingface.co/rhasspy/piper-voices/blob/320d5f7f7751a17ef6512d5c23863056c6a11c0f/ru/ru_RU/dmitri/medium/MODEL_CARD
+  citation: null
+  intended_role: train
+  commercial_use_status: needs_review
+  voice_repository: rhasspy/piper-voices
+  voice_repository_revision: 320d5f7f7751a17ef6512d5c23863056c6a11c0f
+  voice_repository_license: MIT
+  source_dataset: NabuCasa/voice-datasets Dmitri
+  source_dataset_license: CC0
+  source_dataset_license_url: https://creativecommons.org/public-domain/cc0/
+  retrieved_at: "2026-09-20"
+  notes: Model card says one speaker, 22050 Hz, finetuned from lessac medium on a CC0 dataset. Upstream warns users must make their own checkpoint-license judgement. Runtime bundle includes eSpeak NG.
+runtime:
+  executable: ../../../runs/piper-real-v01/venv-1.8.0/Scripts/python.exe
+  executable_sha256: 35b4bd456823c5ea3aba0856b95e113da92d5362a6fa7643f12aef9cc1a1875b
+  entrypoint: python_module
+  module: piper
+  package: piper-tts
+  runtime_version: 1.8.0
+  runtime_license: GPL-3.0-or-later
+  runtime_repository: OHF-Voice/piper1-gpl
+  runtime_revision: 639388b6317fc4731e91d53da42aea68fd4166ff
+  runtime_wheel: piper_tts-1.8.0-cp39-abi3-win_amd64.whl
+  runtime_wheel_sha256: 5da9bfdb05dfe15da3536859d422e605483ffa6d2b3ec2c5b9593bae6b5aa6a4
+  model_path: ../../../runs/piper-real-v01/models/ru_RU-dmitri-medium.onnx
+  model_sha256: f073356ebc4bd0f80c5af58df2953a5988bd5bdab1eb38635ce960b071fbefcb
+  model_config_sha256: 667ef3117bc642c2892dff7690d8bdc8ca4228aeaa783b2dc1416df632855e0d
+voices: []
+voice_id: ru_RU-dmitri-medium
+speakers: []
+selected_speaker_id: null
+selected_speaker_name: null
+generation_params:
+  noise_scale: 0.667
+  length_scale: 1.0
+  noise_w_scale: 0.8
+  normalize_audio: false
+  volume: 1.0
+  sentence_silence: 0.0
+supports_seed: false
+license_review_acknowledged: true
+verification_status: verified

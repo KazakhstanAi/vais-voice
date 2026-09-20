@@ -16,16 +16,57 @@ from vais_voice.utils.io import sha256
 class PiperGenerator(GeneratorAdapter):
     def _runtime(self) -> tuple[str, Path]:
         executable = str(self.config.runtime.get("executable", "piper"))
-        resolved = shutil.which(executable)
+        executable_path = Path(executable)
+        resolved = str(executable_path) if executable_path.is_file() else shutil.which(executable)
         if not resolved:
             raise RuntimeError(f"Piper executable not found: {executable}")
         model = Path(str(self.config.runtime.get("model_path", ""))).expanduser()
         if not model.is_file():
             raise RuntimeError("Piper model_path is not configured or does not exist")
+        config_path = model.with_suffix(model.suffix + ".json")
+        if not config_path.is_file():
+            raise RuntimeError(f"Piper model config not found: {config_path}")
+        expected = {
+            Path(resolved): self.config.runtime.get("executable_sha256"),
+            model: self.config.runtime.get("model_sha256"),
+            config_path: self.config.runtime.get("model_config_sha256"),
+        }
+        for path, digest in expected.items():
+            if digest and sha256(path) != digest:
+                raise RuntimeError(f"Pinned Piper artifact checksum mismatch: {path}")
         return resolved, model
 
+    def _command_prefix(self, executable: str) -> list[str]:
+        if self.config.runtime.get("entrypoint") == "python_module":
+            return [executable, "-m", str(self.config.runtime.get("module", "piper"))]
+        return [executable]
+
     def validate_runtime(self) -> None:
-        self._runtime()
+        executable, _ = self._runtime()
+        expected_version = self.config.runtime.get("runtime_version")
+        if expected_version:
+            if self.config.runtime.get("entrypoint") == "python_module":
+                version_command = [
+                    executable,
+                    "-c",
+                    "import importlib.metadata; print(importlib.metadata.version('piper-tts'))",
+                ]
+            else:
+                version_command = [executable, "--version"]
+            completed = subprocess.run(
+                version_command,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                capture_output=True,
+                timeout=30,
+                check=False,
+            )
+            actual = (completed.stdout or completed.stderr).strip()
+            if completed.returncode or actual != expected_version:
+                raise RuntimeError(
+                    f"Piper runtime version mismatch: expected {expected_version}, got {actual}"
+                )
 
     def synthesize(
         self,
@@ -41,16 +82,43 @@ class PiperGenerator(GeneratorAdapter):
             raise FileExistsError(output_path)
         executable, model = self._runtime()
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        command = [executable, "--model", str(model), "--output_file", str(output_path)]
+        command = [
+            *self._command_prefix(executable),
+            "--model",
+            str(model),
+            "--output_file",
+            str(output_path),
+        ]
         if voice_id is not None:
             command += ["--speaker", voice_id]
-        if generation_params:
+        if self.config.runtime.get("entrypoint") == "python_module":
+            cli_parameters = {
+                "noise_scale": "--noise-scale",
+                "length_scale": "--length-scale",
+                "noise_w_scale": "--noise-w-scale",
+                "sentence_silence": "--sentence-silence",
+                "volume": "--volume",
+            }
+            for name, flag in cli_parameters.items():
+                if name in generation_params:
+                    command += [flag, str(generation_params[name])]
+            if generation_params.get("normalize_audio") is False:
+                command.append("--no-normalize")
+            input_text = text_item.text + "\n"
+        elif generation_params:
             command += ["--json-input"]
             input_text = json.dumps({"text": text_item.text, **generation_params}) + "\n"
         else:
             input_text = text_item.text + "\n"
         completed = subprocess.run(
-            command, input=input_text, text=True, capture_output=True, timeout=600, check=False
+            command,
+            input=input_text,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            capture_output=True,
+            timeout=600,
+            check=False,
         )
         if completed.returncode:
             output_path.unlink(missing_ok=True)
@@ -64,5 +132,11 @@ class PiperGenerator(GeneratorAdapter):
             sample_rate=info.samplerate,
             duration_sec=info.duration,
             codec=output_path.suffix.lstrip("."),
-            metadata={"runtime": "piper_cli"},
+            metadata={
+                "runtime": "piper_cli",
+                "runtime_version": self.config.runtime.get("runtime_version"),
+                "runtime_sha256": self.config.runtime.get("executable_sha256"),
+                "model_sha256": self.config.runtime.get("model_sha256"),
+                "model_config_sha256": self.config.runtime.get("model_config_sha256"),
+            },
         )
