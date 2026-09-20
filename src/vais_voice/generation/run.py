@@ -89,12 +89,17 @@ def _manifest_rows(
                 source_text_id=item.text_id,
                 generator_family=provenance.family,
                 generator_version=version,
+                generator_model=provenance.generator_model or provenance.model_version,
+                generator_runtime=provenance.generator_runtime,
                 voice_id=job.voice_id,
                 generator_speaker_id=job.speaker_id,
                 generator_speaker_name=job.speaker_name,
                 generation_seed=job.seed,
                 generation_params=job.generation_params,
                 intended_role=job.intended_role,
+                quality_gate=config.quality_gate,
+                training_eligible=config.training_eligible,
+                diagnostic_only=config.diagnostic_only,
             )
         )
     return rows

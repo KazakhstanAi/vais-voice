@@ -36,12 +36,17 @@ class Sample(BaseModel):
     source_text_id: str | None = Field(default=None, pattern=r"^[a-zA-Z0-9_-]+$")
     generator_family: str | None = None
     generator_version: str | None = None
+    generator_model: str | None = None
+    generator_runtime: str | None = None
     voice_id: str | None = None
     generator_speaker_id: int | None = Field(default=None, ge=0)
     generator_speaker_name: str | None = None
     generation_seed: int | None = None
     generation_params: dict[str, Any] | None = None
     intended_role: Literal["train", "validation", "unseen_test", "external_challenge"] | None = None
+    quality_gate: Literal["pending", "pass", "warning", "fail"] | None = None
+    training_eligible: bool | None = None
+    diagnostic_only: bool | None = None
     missing_metadata: list[str] = Field(default_factory=list)
 
     @field_validator("related_speaker_ids")
@@ -69,12 +74,17 @@ class Sample(BaseModel):
             for value in (
                 self.generator_family,
                 self.generator_version,
+                self.generator_model,
+                self.generator_runtime,
                 self.voice_id,
                 self.generator_speaker_id,
                 self.generator_speaker_name,
                 self.generation_seed,
                 self.generation_params,
                 self.intended_role,
+                self.quality_gate,
+                self.training_eligible,
+                self.diagnostic_only,
             )
         ):
             raise ValueError("Real samples must not carry generator metadata")

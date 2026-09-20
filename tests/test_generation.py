@@ -430,6 +430,39 @@ def test_pinned_legacy_piper_kk_quality_gate_config() -> None:
         "speaker_id": 0,
         "sentence_silence": 0.2,
     }
+    assert config.provenance.generator_runtime == "piper-standalone-1.2.0"
+    assert config.quality_gate == "pass"
+    assert config.training_eligible is True
+
+
+@pytest.mark.parametrize(
+    ("config_name", "language", "voice", "model_hash"),
+    [
+        (
+            "silero_kk_v5_cis_base_nostress.yaml",
+            "kk",
+            "kaz_zhadyra",
+            "0405777e332906f0644e08a680f7cfdc2137ea864090079c1fdd30a43c1b8761",
+        ),
+        (
+            "silero_ru_v5_5_xenia.yaml",
+            "ru",
+            "xenia",
+            "50081637b602126ee06cb3bc8a744d25651d2da149ee8864b9a379bfdd934437",
+        ),
+    ],
+)
+def test_pinned_silero_pilot_configs(
+    config_name: str, language: str, voice: str, model_hash: str
+) -> None:
+    root = Path(__file__).parents[1]
+    config = load_generator_config(root / "configs/generation/generators" / config_name)
+    assert config.provenance.languages == [language]
+    assert config.voice_id == voice
+    assert config.runtime["torch_version"] == "2.14.0+cpu"
+    assert config.runtime["model_sha256"] == model_hash
+    assert config.quality_gate == "pending"
+    assert config.training_eligible is False
 
 
 def test_real_piper_pilot_plan_has_exactly_ten_train_jobs(tmp_path: Path) -> None:

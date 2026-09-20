@@ -1,0 +1,40 @@
+adapter: silero
+provenance:
+  generator_id: G01_silero_ru_v5_5_xenia
+  display_name: Silero RU v5.5 / xenia
+  family: Silero
+  provider: Silero Team
+  model_id: v5_5_ru
+  model_revision: d9355348e2781dc8fa25a135d1602c530afae24c
+  model_version: v5_5_ru
+  languages: [ru]
+  license: CC BY-NC-SA 4.0
+  license_url: https://github.com/snakers4/silero-models/blob/d9355348e2781dc8fa25a135d1602c530afae24c/LICENSE
+  homepage_url: https://github.com/snakers4/silero-models
+  model_url: https://models.silero.ai/models/tts/ru/v5_5_ru.pt
+  citation: Silero Models, Silero Team, 2025
+  intended_role: train
+  commercial_use_status: research_only
+  generator_model: v5_5_ru/xenia
+  generator_runtime: torch-package-2.14.0+cpu
+  retrieved_at: "2026-09-20"
+  notes: Official Russian v5.5 checkpoint with automatic stress, homographs, and questions; non-commercial research pilot.
+runtime:
+  executable: ../../../runs/silero-pilot-v01/venv/Scripts/python.exe
+  executable_sha256: 35b4bd456823c5ea3aba0856b95e113da92d5362a6fa7643f12aef9cc1a1875b
+  script: ../../../scripts/run_silero_tts.py
+  script_sha256: bf2339c0d790b7343587c83fef2ca2df361e13e2cda0e4527b0c7934ed4f7620
+  torch_version: 2.14.0+cpu
+  model_path: ../../../runs/silero-pilot-v01/models/v5_5_ru.pt
+  model_sha256: 50081637b602126ee06cb3bc8a744d25651d2da149ee8864b9a379bfdd934437
+voices: []
+voice_id: xenia
+generation_params:
+  sample_rate: 48000
+supports_seed: false
+license_review_acknowledged: true
+verification_status: verified
+quality_gate: pending
+training_eligible: false
+diagnostic_only: false
+quality_reason: Awaiting human review of the 10-item Silero pilot.

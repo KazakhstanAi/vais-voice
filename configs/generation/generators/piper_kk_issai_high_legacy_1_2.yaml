@@ -15,6 +15,8 @@ provenance:
   citation: null
   intended_role: train
   commercial_use_status: needs_review
+  generator_model: kk_KZ-issai-high
+  generator_runtime: piper-standalone-1.2.0
   voice_repository: rhasspy/piper-voices
   voice_repository_revision: 320d5f7f7751a17ef6512d5c23863056c6a11c0f
   voice_repository_license: MIT
@@ -64,3 +66,7 @@ generation_params:
 supports_seed: false
 license_review_acknowledged: true
 verification_status: verified
+quality_gate: pass
+training_eligible: true
+diagnostic_only: false
+quality_reason: Canonical Synthetic v0.1 Piper-KK variant; human review rated the control speech nearly indistinguishable from real speech.

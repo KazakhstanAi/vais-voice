@@ -15,6 +15,8 @@ provenance:
   citation: null
   intended_role: train
   commercial_use_status: needs_review
+  generator_model: ru_RU-dmitri-medium
+  generator_runtime: piper-tts-1.8.0
   voice_repository: rhasspy/piper-voices
   voice_repository_revision: 320d5f7f7751a17ef6512d5c23863056c6a11c0f
   voice_repository_license: MIT
@@ -53,3 +55,7 @@ generation_params:
 supports_seed: false
 license_review_acknowledged: true
 verification_status: verified
+quality_gate: fail
+training_eligible: false
+diagnostic_only: true
+quality_reason: Human review found incorrect Russian stress and prosody; do not scale or use for detector training.

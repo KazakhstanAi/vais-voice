@@ -1,0 +1,40 @@
+adapter: silero
+provenance:
+  generator_id: G01_silero_kk_v5_cis_base_nostress_zhadyra
+  display_name: Silero KK v5 CIS base nostress / kaz_zhadyra
+  family: Silero
+  provider: Silero Team
+  model_id: v5_cis_base_nostress
+  model_revision: d9355348e2781dc8fa25a135d1602c530afae24c
+  model_version: v5_cis_base_nostress
+  languages: [kk]
+  license: MIT
+  license_url: https://github.com/snakers4/silero-models/blob/d9355348e2781dc8fa25a135d1602c530afae24c/LICENSE_CIS
+  homepage_url: https://github.com/snakers4/silero-models
+  model_url: https://models.silero.ai/models/tts/ru/v5_cis_base_nostress.pt
+  citation: Silero Models, Silero Team, 2025
+  intended_role: train
+  commercial_use_status: permissive
+  generator_model: v5_cis_base_nostress/kaz_zhadyra
+  generator_runtime: torch-package-2.14.0+cpu
+  retrieved_at: "2026-09-20"
+  notes: Official CIS base nostress checkpoint and Kazakh speaker; quality gate pending.
+runtime:
+  executable: ../../../runs/silero-pilot-v01/venv/Scripts/python.exe
+  executable_sha256: 35b4bd456823c5ea3aba0856b95e113da92d5362a6fa7643f12aef9cc1a1875b
+  script: ../../../scripts/run_silero_tts.py
+  script_sha256: bf2339c0d790b7343587c83fef2ca2df361e13e2cda0e4527b0c7934ed4f7620
+  torch_version: 2.14.0+cpu
+  model_path: ../../../runs/silero-pilot-v01/models/v5_cis_base_nostress.pt
+  model_sha256: 0405777e332906f0644e08a680f7cfdc2137ea864090079c1fdd30a43c1b8761
+voices: []
+voice_id: kaz_zhadyra
+generation_params:
+  sample_rate: 48000
+supports_seed: false
+license_review_acknowledged: true
+verification_status: verified
+quality_gate: pending
+training_eligible: false
+diagnostic_only: false
+quality_reason: Awaiting human review of the 10-item Silero pilot.

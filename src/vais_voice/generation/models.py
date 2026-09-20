@@ -26,6 +26,8 @@ class GeneratorProvenance(BaseModel):
     citation: str | None = None
     intended_role: GeneratorRole
     commercial_use_status: CommercialStatus
+    generator_model: str | None = None
+    generator_runtime: str | None = None
     voice_repository: str | None = None
     voice_repository_revision: str | None = None
     voice_repository_license: str | None = None
@@ -65,6 +67,10 @@ class GeneratorConfig(BaseModel):
     supports_seed: bool = False
     license_review_acknowledged: bool = False
     verification_status: Literal["verified", "runtime_unverified", "infrastructure_test_only"]
+    quality_gate: Literal["pending", "pass", "warning", "fail"] = "pending"
+    training_eligible: bool = False
+    diagnostic_only: bool = False
+    quality_reason: str | None = None
 
     @model_validator(mode="after")
     def check_test_adapter(self) -> "GeneratorConfig":
@@ -80,6 +86,10 @@ class GeneratorConfig(BaseModel):
                 raise ValueError("Selected speaker ID/name must match the configured speaker map")
         elif self.selected_speaker_name is not None:
             raise ValueError("selected_speaker_name requires selected_speaker_id")
+        if self.training_eligible and self.quality_gate != "pass":
+            raise ValueError("Only quality-gate pass generators may be training eligible")
+        if self.training_eligible and self.diagnostic_only:
+            raise ValueError("A generator cannot be training eligible and diagnostic only")
         return self
 
     def require_generation_approval(self) -> None:

@@ -1,0 +1,20 @@
+dataset_id: vais_kzru_synthetic_silero_pilot
+dataset_version: v0.1
+project_root: ../..
+text_inventory: runs/piper-real-v01/text_inventory.jsonl
+output_dir: runs/silero-pilot-v01/plan
+languages: [kk, ru]
+max_texts_per_language: 5
+allowed_source_datasets: [fleurs_kk, fleurs_ru]
+allowed_generator_roles: [train]
+seed_strategy: none
+base_seed: 0
+output_format: wav
+output_sample_rate: null
+failure_policy: stop
+existing_output_policy: fail
+generators:
+  - config: generators/silero_kk_v5_cis_base_nostress.yaml
+    enabled: true
+  - config: generators/silero_ru_v5_5_xenia.yaml
+    enabled: true
