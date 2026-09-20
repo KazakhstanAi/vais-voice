@@ -125,6 +125,19 @@ def build_report(run_dir: Path) -> Path:
             raise ValueError("Pronunciation review artifact does not match this run")
         review_items = existing_review
 
+    review_counts = {
+        status: sum(item.review_status == status for item in review_items)
+        for status in ("pending", "pass", "warning", "fail")
+    }
+    quality_gate_status = (
+        "failed"
+        if review_counts["fail"]
+        else "pending"
+        if review_counts["pending"]
+        else "warning"
+        if review_counts["warning"]
+        else "passed"
+    )
     report = {
         "dataset_id": plan_metadata["dataset_id"],
         "dataset_version": plan_metadata["dataset_version"],
@@ -168,10 +181,12 @@ def build_report(run_dir: Path) -> Path:
         "pronunciation_review": {
             "path": review_path.name,
             "sha256": sha256(review_path),
-            "status_counts": {
-                status: sum(item.review_status == status for item in review_items)
-                for status in ("pending", "pass", "warning", "fail")
-            },
+            "status_counts": review_counts,
+        },
+        "quality_gate": {
+            "status": quality_gate_status,
+            "training_eligible": quality_gate_status == "passed",
+            "diagnostic_only": quality_gate_status == "failed",
         },
     }
     path = run_dir / "generation_report.json"

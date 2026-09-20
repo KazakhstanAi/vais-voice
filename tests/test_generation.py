@@ -237,7 +237,27 @@ def test_deterministic_plan_fake_run_resume_manifest_and_report(tmp_path: Path) 
         "pending": 2,
         "warning": 0,
     }
-    assert (run / "pronunciation_review.jsonl").is_file()
+    assert report["quality_gate"] == {
+        "diagnostic_only": False,
+        "status": "pending",
+        "training_eligible": False,
+    }
+    review_path = run / "pronunciation_review.jsonl"
+    review_items = [
+        json.loads(line) for line in review_path.read_text(encoding="utf-8").splitlines()
+    ]
+    review_items[0]["review_status"] = "fail"
+    review_items[0]["review_notes"] = "Unintelligible; diagnostic only."
+    review_path.write_text(
+        "".join(json.dumps(item, ensure_ascii=False) + "\n" for item in review_items),
+        encoding="utf-8",
+    )
+    failed_report = json.loads(build_report(run).read_text(encoding="utf-8"))
+    assert failed_report["quality_gate"] == {
+        "diagnostic_only": True,
+        "status": "failed",
+        "training_eligible": False,
+    }
 
 
 def test_existing_output_fail_and_regenerate(tmp_path: Path) -> None:
