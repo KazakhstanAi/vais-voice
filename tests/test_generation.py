@@ -494,6 +494,46 @@ def test_pinned_silero_pilot_configs(
     assert config.candidate is candidate
 
 
+@pytest.mark.parametrize(
+    ("config_name", "adapter", "language", "revision", "model_hash"),
+    [
+        (
+            "voxcpm_kazakh.yaml",
+            "voxcpm",
+            "kk",
+            "2a74131895908be29364d0d26c6869c1ca9ba6fa",
+            "7e97ee2cd2ca891662f7da368921df08368a616410afe67461253e4dcd3823cc",
+        ),
+        (
+            "qwen3_tts_ru.yaml",
+            "qwen3_tts",
+            "ru",
+            "0c0e3051f131929182e2c023b9537f8b1c68adfe",
+            "38b1d5971bdbd982b561cccec982669a53b0537c3cf5e9bd4778ed07bb2f5137",
+        ),
+    ],
+)
+def test_pinned_modern_tts_pilot_configs(
+    config_name: str,
+    adapter: str,
+    language: str,
+    revision: str,
+    model_hash: str,
+) -> None:
+    root = Path(__file__).parents[1]
+    config = load_generator_config(root / "configs/generation/generators" / config_name)
+    assert config.adapter == adapter
+    assert config.provenance.languages == [language]
+    assert config.provenance.model_revision == revision
+    assert config.runtime.get("base_model_sha256", config.runtime.get("model_sha256")) == model_hash
+    assert config.runtime["torch_version"] == "2.10.0+cu130"
+    assert config.verification_status == "verified"
+    assert config.quality_gate == "pending"
+    assert config.training_eligible is False
+    assert config.candidate is True
+    assert config.supports_seed is True
+
+
 def test_real_piper_pilot_plan_has_exactly_ten_train_jobs(tmp_path: Path) -> None:
     root = Path(__file__).parents[1]
     items = [

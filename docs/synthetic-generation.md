@@ -80,8 +80,8 @@ not speech and exists only to test infrastructure offline.
 4. Test the boundary with fixtures, then record actual local verification status honestly.
 5. Install heavyweight or CUDA-sensitive dependencies in a model-specific reviewed environment.
 
-Silero, VoxCPM, Qwen3-TTS, MMS, OmniVoice, and AIT-Syn currently have explicit runtime-unverified
-boundaries. Piper has a local CLI integration. The pinned Windows pilot configs for
+MMS, OmniVoice, and AIT-Syn currently have explicit runtime-unverified boundaries. Piper, Silero,
+VoxCPM, and Qwen3-TTS have local subprocess integrations. The pinned Windows pilot configs for
 `kk_KZ-issai-high` and `ru_RU-dmitri-medium` were verified with `piper-tts==1.8.0` in a dedicated
 environment; their runtime and model paths point into the ignored `runs/piper-real-v01/` directory
 and are guarded by SHA-256. Re-download those exact pinned artifacts before reproducing on a new
@@ -93,3 +93,21 @@ MIT. The selected model cards identify CC BY 4.0 Kazakh source data and CC0 Russ
 do not state an unambiguous license for the resulting checkpoints. The configs therefore keep the
 checkpoint license explicitly unknown and retain `commercial_use_status: needs_review`; this pilot
 is a research generation run, not a commercial-clearance decision.
+
+## Modern TTS Pilot v0.1
+
+`configs/generation/kzru_modern_tts_pilot_v01.yaml` is limited to the same five validated Kazakh and
+five validated Russian text identities used by the earlier pilots. It does not scale the dataset or
+start detector training. It pins two generator variants:
+
+- VoxCPM 1.5 plus `ErnarBahat/VoxCPM-KazakhTTS-Lora` for Kazakh, loaded from immutable base/LoRA
+  revisions. Inference fails closed unless all 320 LoRA keys load without skips. Output remains at
+  the model's native 44.1 kHz.
+- Qwen3-TTS 12Hz 1.7B CustomVoice for Russian with the fixed `Serena` timbre and a fixed neutral
+  instruction. Output remains at the model's native 24 kHz.
+
+Both use per-job hash seeds, dedicated CUDA 13.0 environments with `torch==2.10.0+cu130`, UTF-8
+input files, and explicit weight/runner hashes. No waveform normalization or resampling is applied.
+The generated samples remain `quality_gate: pending`, `training_eligible: false` until manual review.
+The VoxCPM LoRA and base model state Apache-2.0, but its upstream KazakhTTS dataset card does not
+state an SPDX license; the config therefore keeps commercial clearance in `needs_review`.

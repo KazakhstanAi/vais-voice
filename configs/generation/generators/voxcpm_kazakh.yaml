@@ -1,23 +1,61 @@
 adapter: voxcpm
 provenance:
-  generator_id: G03_voxcpm_kazakh
-  display_name: VoxCPM Kazakh adaptation
+  generator_id: G03_voxcpm15_kazakh_lora
+  display_name: VoxCPM 1.5 Kazakh LoRA
   family: VoxCPM
-  provider: TODO
-  model_id: null
-  model_revision: null
-  model_version: null
+  provider: OpenBMB / ErnarBahat
+  model_id: ErnarBahat/VoxCPM-KazakhTTS-Lora
+  model_revision: 2a74131895908be29364d0d26c6869c1ca9ba6fa
+  model_version: VoxCPM1.5-Kazakh-LoRA-step-4160
   languages: [kk]
-  license: null
-  license_url: null
-  homepage_url: null
-  model_url: null
-  citation: null
+  license: Apache-2.0
+  license_url: https://huggingface.co/ErnarBahat/VoxCPM-KazakhTTS-Lora/blob/2a74131895908be29364d0d26c6869c1ca9ba6fa/README.md
+  homepage_url: https://github.com/allssai/voxcpm-kazakh-tts
+  model_url: https://huggingface.co/ErnarBahat/VoxCPM-KazakhTTS-Lora/tree/2a74131895908be29364d0d26c6869c1ca9ba6fa
+  citation: VoxCPM (Zhou et al., 2025); KazakhTTS2 (Mussakhojayeva et al., 2022)
   intended_role: train
   commercial_use_status: needs_review
-  notes: Exact adaptation and all upstream metadata require verification.
-runtime: {}
+  generator_model: openbmb/VoxCPM1.5 + ErnarBahat/VoxCPM-KazakhTTS-Lora
+  generator_runtime: vendored-voxcpm-kazakh-tts@60b477f + torch-2.10.0+cu130
+  voice_repository: allssai/voxcpm-kazakh-tts
+  voice_repository_revision: 60b477f5045a953c6a47ef2f7d1ae50133cb285a
+  voice_repository_license: Apache-2.0
+  source_dataset: issai/KazakhTTS (66.1 hours stated by LoRA author)
+  source_dataset_license: No explicit SPDX license in pinned Hugging Face dataset card; attribution and acceptable-use text applies
+  source_dataset_license_url: https://huggingface.co/datasets/issai/KazakhTTS/blob/821c7d583331fd2ae50283a00147772ef0734fd2/README.md
+  retrieved_at: "2026-09-21"
+  notes: Research pilot only. Base model and LoRA state Apache-2.0, but the upstream KazakhTTS dataset card does not state an SPDX license; do not infer commercial clearance.
+runtime:
+  executable: ../../../runs/modern-tts-pilot-v01/venv-voxcpm/Scripts/python.exe
+  executable_sha256: 35b4bd456823c5ea3aba0856b95e113da92d5362a6fa7643f12aef9cc1a1875b
+  script: ../../../scripts/run_voxcpm_tts.py
+  script_sha256: 28c745d93afa1074a4e3bd02b8a21cebc23052a95c8116830b712d1f45f3a2e1
+  upstream_path: ../../../runs/modern-tts-pilot-v01/upstream/voxcpm-kazakh-tts
+  upstream_revision: 60b477f5045a953c6a47ef2f7d1ae50133cb285a
+  base_model_path: ../../../runs/modern-tts-pilot-v01/models/voxcpm1.5
+  base_model_id: openbmb/VoxCPM1.5
+  base_model_revision: 8cdc403854cda0e3af12252d27da038fda5982ac
+  base_model_sha256: 7e97ee2cd2ca891662f7da368921df08368a616410afe67461253e4dcd3823cc
+  audiovae_sha256: 8160987a7f10acd4c49b72a9a3e974c0b5c1c786538cd4bcaac5f2df388c0f14
+  lora_path: ../../../runs/modern-tts-pilot-v01/models/voxcpm-kazakh-lora
+  lora_sha256: fb4ac7cf64b046cfe99025f32d37109d099ec8dd72fc8fcc7bef1fbb00a4ffd2
+  expected_lora_keys: 320
+  torch_version: 2.10.0+cu130
+  transformers_version: 5.1.0
+  cuda_runtime: "13.0"
 voices: []
-generation_params: {}
-license_review_acknowledged: false
-verification_status: runtime_unverified
+voice_id: kazakh_lora_default
+generation_params:
+  cfg_value: 2.0
+  inference_timesteps: 10
+  max_len: 600
+  normalize: false
+  denoise: false
+supports_seed: true
+license_review_acknowledged: true
+verification_status: verified
+quality_gate: pending
+training_eligible: false
+diagnostic_only: false
+candidate: true
+quality_reason: Awaiting human review of the five-item Modern TTS pilot.

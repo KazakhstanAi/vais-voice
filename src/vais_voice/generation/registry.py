@@ -10,7 +10,14 @@ from vais_voice.utils.io import load_yaml
 def load_generator_config(path: Path) -> GeneratorConfig:
     config = GeneratorConfig.model_validate(load_yaml(path))
     runtime = dict(config.runtime)
-    for key in ("executable", "model_path", "script"):
+    for key in (
+        "executable",
+        "model_path",
+        "script",
+        "upstream_path",
+        "base_model_path",
+        "lora_path",
+    ):
         value = str(runtime.get(key, ""))
         candidate = Path(value)
         if value and not candidate.is_absolute() and ("/" in value or "\\" in value):
@@ -31,7 +38,15 @@ def adapter_from_config(config: GeneratorConfig) -> GeneratorAdapter:
         from vais_voice.generation.adapters.silero import SileroGenerator
 
         return SileroGenerator(config)
-    if config.adapter in {"voxcpm", "qwen3_tts", "mms", "omnivoice", "ait_syn"}:
+    if config.adapter == "voxcpm":
+        from vais_voice.generation.adapters.voxcpm import VoxCPMGenerator
+
+        return VoxCPMGenerator(config)
+    if config.adapter == "qwen3_tts":
+        from vais_voice.generation.adapters.qwen3_tts import Qwen3TTSGenerator
+
+        return Qwen3TTSGenerator(config)
+    if config.adapter in {"mms", "omnivoice", "ait_syn"}:
         from vais_voice.generation.adapters.unverified import RuntimeUnverifiedGenerator
 
         return RuntimeUnverifiedGenerator(config)

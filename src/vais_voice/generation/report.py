@@ -182,6 +182,9 @@ def build_report(run_dir: Path) -> Path:
                 "model_id": value.provenance.model_id,
                 "model_revision": value.provenance.model_revision,
                 "model_sha256": value.runtime.get("model_sha256"),
+                "base_model_sha256": value.runtime.get("base_model_sha256"),
+                "lora_sha256": value.runtime.get("lora_sha256"),
+                "speech_tokenizer_sha256": value.runtime.get("speech_tokenizer_sha256"),
                 "model_config_sha256": value.runtime.get("model_config_sha256"),
             }
             for key, value in sorted(configs.items())
