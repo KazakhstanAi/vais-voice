@@ -105,6 +105,9 @@ def build_report(run_dir: Path) -> Path:
             speaker=job.speaker_name or "single-speaker/default",
             speaker_id=job.speaker_id,
             audio_path=job.output_relative_path,
+            training_eligible=configs[job.generator_id].training_eligible,
+            diagnostic_only=configs[job.generator_id].diagnostic_only,
+            candidate=configs[job.generator_id].candidate,
         )
         for job in jobs
         if job.job_id in valid_job_ids
