@@ -48,8 +48,8 @@ generation_params:
 supports_seed: true
 license_review_acknowledged: true
 verification_status: verified
-quality_gate: pending
-training_eligible: false
+quality_gate: pass
+training_eligible: true
 diagnostic_only: false
-candidate: true
-quality_reason: Awaiting human review of the five-item Modern TTS pilot.
+candidate: false
+quality_reason: Human review rated all five Russian samples very good, comparable in perceived quality to Yandex Alice, with no reported content or pronunciation failures.

@@ -108,6 +108,9 @@ start detector training. It pins two generator variants:
 
 Both use per-job hash seeds, dedicated CUDA 13.0 environments with `torch==2.10.0+cu130`, UTF-8
 input files, and explicit weight/runner hashes. No waveform normalization or resampling is applied.
-The generated samples remain `quality_gate: pending`, `training_eligible: false` until manual review.
+Manual review rated all five Russian samples as high-quality and training eligible. Two Kazakh
+samples without digits passed; three samples containing Arabic numerals remain warnings and are not
+training eligible because the model pronounced those numerals in English. The VoxCPM generator is
+therefore a candidate with a generator-level warning rather than a blanket pass.
 The VoxCPM LoRA and base model state Apache-2.0, but its upstream KazakhTTS dataset card does not
 state an SPDX license; the config therefore keeps commercial clearance in `needs_review`.

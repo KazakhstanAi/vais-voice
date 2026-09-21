@@ -495,7 +495,16 @@ def test_pinned_silero_pilot_configs(
 
 
 @pytest.mark.parametrize(
-    ("config_name", "adapter", "language", "revision", "model_hash"),
+    (
+        "config_name",
+        "adapter",
+        "language",
+        "revision",
+        "model_hash",
+        "quality_gate",
+        "training_eligible",
+        "candidate",
+    ),
     [
         (
             "voxcpm_kazakh.yaml",
@@ -503,6 +512,9 @@ def test_pinned_silero_pilot_configs(
             "kk",
             "2a74131895908be29364d0d26c6869c1ca9ba6fa",
             "7e97ee2cd2ca891662f7da368921df08368a616410afe67461253e4dcd3823cc",
+            "warning",
+            False,
+            True,
         ),
         (
             "qwen3_tts_ru.yaml",
@@ -510,6 +522,9 @@ def test_pinned_silero_pilot_configs(
             "ru",
             "0c0e3051f131929182e2c023b9537f8b1c68adfe",
             "38b1d5971bdbd982b561cccec982669a53b0537c3cf5e9bd4778ed07bb2f5137",
+            "pass",
+            True,
+            False,
         ),
     ],
 )
@@ -519,6 +534,9 @@ def test_pinned_modern_tts_pilot_configs(
     language: str,
     revision: str,
     model_hash: str,
+    quality_gate: str,
+    training_eligible: bool,
+    candidate: bool,
 ) -> None:
     root = Path(__file__).parents[1]
     config = load_generator_config(root / "configs/generation/generators" / config_name)
@@ -528,9 +546,9 @@ def test_pinned_modern_tts_pilot_configs(
     assert config.runtime.get("base_model_sha256", config.runtime.get("model_sha256")) == model_hash
     assert config.runtime["torch_version"] == "2.10.0+cu130"
     assert config.verification_status == "verified"
-    assert config.quality_gate == "pending"
-    assert config.training_eligible is False
-    assert config.candidate is True
+    assert config.quality_gate == quality_gate
+    assert config.training_eligible is training_eligible
+    assert config.candidate is candidate
     assert config.supports_seed is True
 
 

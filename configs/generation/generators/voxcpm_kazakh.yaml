@@ -54,8 +54,8 @@ generation_params:
 supports_seed: true
 license_review_acknowledged: true
 verification_status: verified
-quality_gate: pending
+quality_gate: warning
 training_eligible: false
 diagnostic_only: false
 candidate: true
-quality_reason: Awaiting human review of the five-item Modern TTS pilot.
+quality_reason: Human review found generally good voices, but Arabic numerals are spoken in English; numeric samples are not training eligible until text normalization is controlled.
