@@ -138,6 +138,36 @@ def build_report(run_dir: Path) -> Path:
         if review_counts["warning"]
         else "passed"
     )
+    jobs_by_sample_id = {f"synth_{job.job_id}": job for job in jobs}
+    reviews_by_generator: dict[str, list[PronunciationReviewItem]] = defaultdict(list)
+    for item in review_items:
+        reviews_by_generator[jobs_by_sample_id[item.sample_id].generator_id].append(item)
+    quality_gate_by_generator = {}
+    for generator_id, items in sorted(reviews_by_generator.items()):
+        status_counts = {
+            status: sum(item.review_status == status for item in items)
+            for status in ("pending", "pass", "warning", "fail")
+        }
+        status = (
+            "failed"
+            if status_counts["fail"]
+            else "pending"
+            if status_counts["pending"]
+            else "warning"
+            if status_counts["warning"]
+            else "passed"
+        )
+        quality_gate_by_generator[generator_id] = {
+            "status": status,
+            "training_eligible": bool(items)
+            and all(item.training_eligible for item in items),
+            "diagnostic_only": bool(items) and all(item.diagnostic_only for item in items),
+            "candidate": any(item.candidate for item in items),
+            "quality_tier_counts": dict(
+                sorted(Counter(item.quality_tier for item in items if item.quality_tier).items())
+            ),
+            "status_counts": status_counts,
+        }
     report = {
         "dataset_id": plan_metadata["dataset_id"],
         "dataset_version": plan_metadata["dataset_version"],
@@ -185,9 +215,12 @@ def build_report(run_dir: Path) -> Path:
         },
         "quality_gate": {
             "status": quality_gate_status,
-            "training_eligible": quality_gate_status == "passed",
-            "diagnostic_only": quality_gate_status == "failed",
+            "training_eligible": bool(review_items)
+            and all(item.training_eligible for item in review_items),
+            "diagnostic_only": bool(review_items)
+            and all(item.diagnostic_only for item in review_items),
         },
+        "quality_gate_by_generator": quality_gate_by_generator,
     }
     path = run_dir / "generation_report.json"
     if path.exists():

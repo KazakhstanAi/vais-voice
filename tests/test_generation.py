@@ -250,16 +250,23 @@ def test_deterministic_plan_fake_run_resume_manifest_and_report(tmp_path: Path) 
     ]
     review_items[0]["review_status"] = "fail"
     review_items[0]["review_notes"] = "Unintelligible; diagnostic only."
+    review_items[0]["diagnostic_only"] = True
     review_path.write_text(
         "".join(json.dumps(item, ensure_ascii=False) + "\n" for item in review_items),
         encoding="utf-8",
     )
     failed_report = json.loads(build_report(run).read_text(encoding="utf-8"))
     assert failed_report["quality_gate"] == {
-        "diagnostic_only": True,
+        "diagnostic_only": False,
         "status": "failed",
         "training_eligible": False,
     }
+    failed_generator = next(
+        gate
+        for gate in failed_report["quality_gate_by_generator"].values()
+        if gate["status"] == "failed"
+    )
+    assert failed_generator["diagnostic_only"] is False
 
 
 def test_existing_output_fail_and_regenerate(tmp_path: Path) -> None:
@@ -436,24 +443,44 @@ def test_pinned_legacy_piper_kk_quality_gate_config() -> None:
 
 
 @pytest.mark.parametrize(
-    ("config_name", "language", "voice", "model_hash"),
+    (
+        "config_name",
+        "language",
+        "voice",
+        "model_hash",
+        "quality_gate",
+        "diagnostic_only",
+        "candidate",
+    ),
     [
         (
             "silero_kk_v5_cis_base_nostress.yaml",
             "kk",
             "kaz_zhadyra",
             "0405777e332906f0644e08a680f7cfdc2137ea864090079c1fdd30a43c1b8761",
+            "fail",
+            True,
+            False,
         ),
         (
             "silero_ru_v5_5_xenia.yaml",
             "ru",
             "xenia",
             "50081637b602126ee06cb3bc8a744d25651d2da149ee8864b9a379bfdd934437",
+            "warning",
+            False,
+            True,
         ),
     ],
 )
 def test_pinned_silero_pilot_configs(
-    config_name: str, language: str, voice: str, model_hash: str
+    config_name: str,
+    language: str,
+    voice: str,
+    model_hash: str,
+    quality_gate: str,
+    diagnostic_only: bool,
+    candidate: bool,
 ) -> None:
     root = Path(__file__).parents[1]
     config = load_generator_config(root / "configs/generation/generators" / config_name)
@@ -461,8 +488,10 @@ def test_pinned_silero_pilot_configs(
     assert config.voice_id == voice
     assert config.runtime["torch_version"] == "2.14.0+cpu"
     assert config.runtime["model_sha256"] == model_hash
-    assert config.quality_gate == "pending"
+    assert config.quality_gate == quality_gate
     assert config.training_eligible is False
+    assert config.diagnostic_only is diagnostic_only
+    assert config.candidate is candidate
 
 
 def test_real_piper_pilot_plan_has_exactly_ten_train_jobs(tmp_path: Path) -> None:

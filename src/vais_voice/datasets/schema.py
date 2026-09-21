@@ -47,6 +47,7 @@ class Sample(BaseModel):
     quality_gate: Literal["pending", "pass", "warning", "fail"] | None = None
     training_eligible: bool | None = None
     diagnostic_only: bool | None = None
+    candidate: bool | None = None
     missing_metadata: list[str] = Field(default_factory=list)
 
     @field_validator("related_speaker_ids")
@@ -85,6 +86,7 @@ class Sample(BaseModel):
                 self.quality_gate,
                 self.training_eligible,
                 self.diagnostic_only,
+                self.candidate,
             )
         ):
             raise ValueError("Real samples must not carry generator metadata")

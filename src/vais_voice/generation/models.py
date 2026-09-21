@@ -70,6 +70,7 @@ class GeneratorConfig(BaseModel):
     quality_gate: Literal["pending", "pass", "warning", "fail"] = "pending"
     training_eligible: bool = False
     diagnostic_only: bool = False
+    candidate: bool = False
     quality_reason: str | None = None
 
     @model_validator(mode="after")
@@ -90,6 +91,8 @@ class GeneratorConfig(BaseModel):
             raise ValueError("Only quality-gate pass generators may be training eligible")
         if self.training_eligible and self.diagnostic_only:
             raise ValueError("A generator cannot be training eligible and diagnostic only")
+        if self.candidate and self.diagnostic_only:
+            raise ValueError("A generator cannot be both a candidate and diagnostic only")
         return self
 
     def require_generation_approval(self) -> None:
@@ -161,3 +164,17 @@ class PronunciationReviewItem(BaseModel):
     audio_path: str
     review_status: Literal["pending", "pass", "warning", "fail"] = "pending"
     review_notes: str = ""
+    training_eligible: bool = False
+    diagnostic_only: bool = False
+    candidate: bool = False
+    quality_tier: Literal["easy_spoof", "medium_spoof", "high_quality_spoof"] | None = None
+
+    @model_validator(mode="after")
+    def check_quality_decision(self) -> "PronunciationReviewItem":
+        if self.training_eligible and self.review_status != "pass":
+            raise ValueError("Only reviewed pass samples may be training eligible")
+        if self.training_eligible and self.diagnostic_only:
+            raise ValueError("A review cannot be training eligible and diagnostic only")
+        if self.candidate and self.diagnostic_only:
+            raise ValueError("A review cannot be both a candidate and diagnostic only")
+        return self

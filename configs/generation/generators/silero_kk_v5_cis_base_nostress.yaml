@@ -18,7 +18,7 @@ provenance:
   generator_model: v5_cis_base_nostress/kaz_zhadyra
   generator_runtime: torch-package-2.14.0+cpu
   retrieved_at: "2026-09-20"
-  notes: Official CIS base nostress checkpoint and Kazakh speaker; quality gate pending.
+  notes: Official CIS base nostress checkpoint and Kazakh speaker; retained as an easy-spoof diagnostic generator.
 runtime:
   executable: ../../../runs/silero-pilot-v01/venv/Scripts/python.exe
   executable_sha256: 35b4bd456823c5ea3aba0856b95e113da92d5362a6fa7643f12aef9cc1a1875b
@@ -34,7 +34,8 @@ generation_params:
 supports_seed: false
 license_review_acknowledged: true
 verification_status: verified
-quality_gate: pending
+quality_gate: fail
 training_eligible: false
-diagnostic_only: false
-quality_reason: Awaiting human review of the 10-item Silero pilot.
+diagnostic_only: true
+candidate: false
+quality_reason: Human review found audible synthetic background noise, skipped numbers, incorrect endings, and intonation errors.

@@ -100,6 +100,7 @@ def _manifest_rows(
                 quality_gate=config.quality_gate,
                 training_eligible=config.training_eligible,
                 diagnostic_only=config.diagnostic_only,
+                candidate=config.candidate,
             )
         )
     return rows

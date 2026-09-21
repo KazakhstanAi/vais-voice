@@ -34,7 +34,8 @@ generation_params:
 supports_seed: false
 license_review_acknowledged: true
 verification_status: verified
-quality_gate: pending
+quality_gate: warning
 training_eligible: false
 diagnostic_only: false
-quality_reason: Awaiting human review of the 10-item Silero pilot.
+candidate: true
+quality_reason: Generally good with some convincing samples, but occasional synthetic background and incorrect intonation require per-sample review.
