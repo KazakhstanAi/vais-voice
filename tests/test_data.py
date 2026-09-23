@@ -110,6 +110,44 @@ def test_automatic_splits_deterministic_and_order_independent(corpus):
     assert {r.split for r in first} == {"train", "val", "test"}
 
 
+def test_known_synthetic_voice_can_cross_splits_while_text_pairs_stay_together(corpus):
+    root, _ = corpus
+    base_real, base_synthetic = read_manifest(root / "input.jsonl")[:2]
+    rows = []
+    for group in range(60):
+        text_id = f"text_{group}"
+        rows.extend(
+            [
+                base_real.model_copy(
+                    update={
+                        "sample_id": f"real_{group}",
+                        "speaker_id": f"real_speaker_{group}",
+                        "source_id": f"real_source_{group}",
+                        "text_id": text_id,
+                        "split": None,
+                    }
+                ),
+                base_synthetic.model_copy(
+                    update={
+                        "sample_id": f"synthetic_{group}",
+                        "speaker_id": "one_known_tts_voice",
+                        "source_id": f"synthetic_source_{group}",
+                        "source_text_id": text_id,
+                        "split": None,
+                    }
+                ),
+            ]
+        )
+    assigned = assign_splits(
+        rows, seed=42, train_fraction=0.7, val_fraction=0.15, unseen_generators=[]
+    )
+    by_text = {}
+    for row in assigned:
+        by_text.setdefault(row.source_text_id or row.text_id, set()).add(row.split)
+    assert all(len(splits) == 1 for splits in by_text.values())
+    assert {row.split for row in assigned} == {"train", "val", "test"}
+
+
 def test_path_traversal_rejected(tmp_path):
     with pytest.raises(ValueError, match="escapes"):
         contained_path(tmp_path, "../elsewhere.wav")

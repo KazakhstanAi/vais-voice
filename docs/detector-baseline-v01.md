@@ -57,3 +57,22 @@ Each run writes the best checkpoint, history, validation-selected threshold, pre
 metadata, and benchmark JSON with ROC-AUC, EER, and FPR@TPR95 slices. A protected unseen-generator
 result must remain marked as planned until a genuinely held-out, quality-approved generator is
 available; it must not be simulated from the same generator family.
+
+## Current KK-only pilot result
+
+The first local research run deliberately excludes Russian synthetic speech because the scaled
+Qwen3-TTS corpus pilot was unstable. The evaluated corpus contains 1,000 FLEURS KK real clips and
+500 Piper 1.2 KK clips. Its deterministic split is 1,064 train / 203 validation / 233 test, with
+both labels in every partition and no `text_id` overlap.
+
+Both baselines reached ROC-AUC 1.0, EER 0.0, and FPR@TPR95 0.0 on the seen-Piper test. These numbers
+show that the pipeline and checkpoints work; they are not evidence of general deepfake detection.
+The result is likely dominated by one-generator/channel fingerprints. The protected unseen slice is
+undefined, Russian is absent, and FLEURS does not expose stable speaker IDs. The deployable demo
+checkpoint is therefore the smaller log-Mel CNN (`SHA-256
+3a711c2fabfc85c7239940a229ed77adff1b28077760faa6b1dd80e9ed942ce0`) and must be presented as a
+KK known-generator research prototype.
+
+The Qwen3-TTS temperature-0.7 stabilization experiment rejected all five normalized FLEURS inputs
+and four of five raw-transcription inputs at the deterministic runaway gate. It remains diagnostic
+only and is not included in detector training.

@@ -60,7 +60,8 @@ def prepare(config_path: Path, *, split_now: bool = False) -> Path:
         if source.stat().st_size > config.max_file_bytes:
             raise ValueError(f"Oversized audio for sample {row.sample_id}")
         digest = sha256(source)
-        if row.source_sha256 and row.source_sha256 != digest:
+        expected = row.processed_sha256 or row.source_sha256
+        if expected and expected != digest:
             raise ValueError(f"Source checksum mismatch for {row.sample_id}")
         hashed.append(row.model_copy(update={"source_sha256": digest}))
         sources[row.sample_id] = source

@@ -1,0 +1,13 @@
+dataset_version: kk-detector-pilot-v0.1
+split_version: kk-known-generator-v0.1
+seed: 20260923
+project_root: ../..
+manifest: data/staging/kk_detector_pilot_v01/manifest.parquet
+audio_root: data/staging/kk_detector_pilot_v01
+output_dir: data/processed/kk_detector_pilot_v01
+sample_rate: 16000
+max_duration_seconds: 45
+max_file_bytes: 52428800
+train_fraction: 0.70
+val_fraction: 0.15
+unseen_generators: []

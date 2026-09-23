@@ -1,0 +1,25 @@
+experiment: vais-detector-wav2vec2-mlp-kk-v0.1
+seed: 20260923
+project_root: ../..
+prepared_manifest: data/processed/kk_detector_pilot_v01/manifest.split.parquet
+preparation_report: data/processed/kk_detector_pilot_v01/split_preparation.json
+run_dir: runs/detector-wav2vec2-mlp-kk-v0.1
+device: auto
+epochs: 20
+patience: 4
+amp: true
+model:
+  architecture: wav2vec2_frozen_mlp
+  sample_rate: 16000
+  max_duration_seconds: 4.0
+  n_mels: 64
+  hidden_dim: 192
+  ssl_bundle: WAV2VEC2_BASE
+optimizer:
+  learning_rate: 0.001
+  weight_decay: 0.0001
+loader:
+  batch_size: 8
+  num_workers: 0
+  require_training_eligible: true
+unseen_generators: []

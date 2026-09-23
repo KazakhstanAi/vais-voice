@@ -19,6 +19,7 @@ dist/
 # Local data and metadata
 data/raw/
 data/processed/
+data/staging/
 data/manifests/local/
 # Experiments: recordings, checkpoints, predictions, metrics, environment snapshots
 runs/

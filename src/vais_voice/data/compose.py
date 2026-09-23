@@ -20,7 +20,13 @@ def _eligible_synthetic(row: Sample) -> bool:
     )
 
 
-def compose_detector_corpus(real_manifest: Path, synthetic_manifest: Path, output: Path) -> Path:
+def compose_detector_corpus(
+    real_manifest: Path,
+    synthetic_manifest: Path,
+    output: Path,
+    *,
+    languages: set[str] | None = None,
+) -> Path:
     real_manifest = real_manifest.resolve()
     synthetic_manifest = synthetic_manifest.resolve()
     output = output.resolve()
@@ -31,6 +37,11 @@ def compose_detector_corpus(real_manifest: Path, synthetic_manifest: Path, outpu
     if any(row.label != "real" for row in real_rows):
         raise ValueError("The real manifest must contain only real samples")
     synthetic_rows = read_manifest(synthetic_manifest)
+    if languages:
+        real_rows = [row for row in real_rows if row.language in languages]
+        synthetic_rows = [row for row in synthetic_rows if row.language in languages]
+    if not real_rows:
+        raise ValueError("No real samples remain after language filtering")
     eligible = [row for row in synthetic_rows if _eligible_synthetic(row)]
     if not eligible:
         raise ValueError("No pass-gated, training-eligible synthetic samples were found")
@@ -93,6 +104,7 @@ def compose_detector_corpus(real_manifest: Path, synthetic_manifest: Path, outpu
                 "diagnostic_only": False,
                 "intended_role": "train",
             },
+            "languages": sorted(languages) if languages else None,
         },
     )
     return output
@@ -103,9 +115,17 @@ def main() -> None:
     parser.add_argument("--real-manifest", type=Path, required=True)
     parser.add_argument("--synthetic-manifest", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--languages", nargs="+", choices=["kk", "ru"])
     args = parser.parse_args()
     try:
-        print(compose_detector_corpus(args.real_manifest, args.synthetic_manifest, args.output))
+        print(
+            compose_detector_corpus(
+                args.real_manifest,
+                args.synthetic_manifest,
+                args.output,
+                languages=set(args.languages) if args.languages else None,
+            )
+        )
     except (ValueError, OSError) as exc:
         parser.exit(2, f"Composition failed: {exc}\n")
 

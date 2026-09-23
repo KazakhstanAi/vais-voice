@@ -17,7 +17,14 @@ def connected_groups(rows: list[Sample]) -> list[list[int]]:
 
     owners: dict[str, int] = {}
     for i, row in enumerate(rows):
-        tokens = [f"speaker:{s}" for s in [row.speaker_id, *row.related_speaker_ids]]
+        # Real speakers are protected across splits. Synthetic voices are controlled through
+        # generator holdout; joining every clip from a single-speaker TTS would collapse a known
+        # generator corpus into one component and make seen-generator validation impossible.
+        tokens = (
+            [f"speaker:{s}" for s in [row.speaker_id, *row.related_speaker_ids]]
+            if row.label == "real"
+            else []
+        )
         tokens += [f"source:{row.source_id}", f"sample:{row.sample_id}"]
         if row.parent_sample_id:
             tokens.append(f"sample:{row.parent_sample_id}")

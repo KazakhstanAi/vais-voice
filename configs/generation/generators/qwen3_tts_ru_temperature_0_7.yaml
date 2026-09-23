@@ -57,8 +57,8 @@ generation_params:
 supports_seed: true
 license_review_acknowledged: true
 verification_status: verified
-quality_gate: pending
+quality_gate: fail
 training_eligible: false
-diagnostic_only: false
-candidate: true
-quality_reason: Same pinned model/runtime as the approved pilot, but temperature 0.7 and corpus text normalization require a new human quality gate before training use.
+diagnostic_only: true
+candidate: false
+quality_reason: Rejected for corpus scaling. Normalized FLEURS produced 0/5 valid outputs; raw_transcription v0.2 produced only 1/5, with the other four exhausting all deterministic runaway retries.

@@ -1,0 +1,17 @@
+dataset_id: vais_kzru_real_detector
+dataset_version: detector-real-v0.2
+project_root: ../..
+output_dir: data/processed/kzru_real_detector_v02
+include_roles: [primary]
+languages: [kk, ru]
+max_samples: 2000
+max_duration_hours: 12
+duplicate_policy: report
+sample_rate: 16000
+max_duration_seconds: 120
+max_file_bytes: 52428800
+sources:
+  - config: sources/fleurs_kk_detector_raw_v02.yaml
+    max_samples: 1000
+  - config: sources/fleurs_ru_detector_raw_v02.yaml
+    max_samples: 1000
