@@ -20,9 +20,7 @@ def _eligible_synthetic(row: Sample) -> bool:
     )
 
 
-def compose_detector_corpus(
-    real_manifest: Path, synthetic_manifest: Path, output: Path
-) -> Path:
+def compose_detector_corpus(real_manifest: Path, synthetic_manifest: Path, output: Path) -> Path:
     real_manifest = real_manifest.resolve()
     synthetic_manifest = synthetic_manifest.resolve()
     output = output.resolve()

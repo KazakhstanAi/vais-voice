@@ -162,8 +162,7 @@ def build_report(run_dir: Path) -> Path:
         )
         quality_gate_by_generator[generator_id] = {
             "status": status,
-            "training_eligible": bool(items)
-            and all(item.training_eligible for item in items),
+            "training_eligible": bool(items) and all(item.training_eligible for item in items),
             "diagnostic_only": bool(items) and all(item.diagnostic_only for item in items),
             "candidate": any(item.candidate for item in items),
             "quality_tier_counts": dict(

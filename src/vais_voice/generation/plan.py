@@ -83,10 +83,7 @@ def create_plan(config_path: Path) -> Path:
             item
             for item in items
             if item.language == language
-            and (
-                config.max_text_characters is None
-                or len(item.text) <= config.max_text_characters
-            )
+            and (config.max_text_characters is None or len(item.text) <= config.max_text_characters)
             and (
                 not config.allowed_source_datasets
                 or item.source_dataset in config.allowed_source_datasets

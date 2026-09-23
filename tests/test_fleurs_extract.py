@@ -5,7 +5,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import soundfile as sf
 
-from scripts.extract_fleurs_parquet import extract
+from vais_voice.data.fleurs_extract import extract
 
 
 def test_extract_fleurs_parquet_fixture(tmp_path):

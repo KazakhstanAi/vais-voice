@@ -98,9 +98,7 @@ class Qwen3TTSGenerator(GeneratorAdapter):
         effective_max_tokens = configured_max_tokens
         if tokens_per_character > 0:
             estimated_limit = math.ceil(len(effective_text) * tokens_per_character) + token_reserve
-            effective_max_tokens = min(
-                configured_max_tokens, max(minimum_tokens, estimated_limit)
-            )
+            effective_max_tokens = min(configured_max_tokens, max(minimum_tokens, estimated_limit))
         request = {
             "text": effective_text,
             "output_file": str(output_path.resolve()),

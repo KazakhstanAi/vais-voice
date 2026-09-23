@@ -105,9 +105,7 @@ class VoxCPMGenerator(GeneratorAdapter):
         if expected_keys is not None:
             command.extend(("--expected-lora-keys", str(expected_keys)))
         try:
-            completed = subprocess.run(
-                command, capture_output=True, timeout=1800, check=False
-            )
+            completed = subprocess.run(command, capture_output=True, timeout=1800, check=False)
         finally:
             input_path.unlink(missing_ok=True)
         if completed.returncode:
