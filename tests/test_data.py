@@ -5,7 +5,8 @@ import pytest
 import soundfile as sf
 from pydantic import ValidationError
 
-from vais_voice.datasets.manifest import Sample, read_manifest
+from vais_voice.data.compose import compose_detector_corpus
+from vais_voice.datasets.manifest import Sample, read_manifest, write_manifest
 from vais_voice.datasets.split import assign_splits, connected_groups
 from vais_voice.preprocessing.audio import preprocess
 from vais_voice.utils.io import contained_path
@@ -159,3 +160,64 @@ def test_blank_speaker_rejected(corpus):
     row["speaker_id"] = " "
     with pytest.raises(ValidationError):
         Sample.model_validate(row)
+
+
+def test_compose_detector_corpus_filters_synthetic_quality(tmp_path):
+    real_root = tmp_path / "real"
+    synthetic_root = tmp_path / "synthetic"
+    real_root.mkdir()
+    synthetic_root.mkdir()
+    sf.write(real_root / "real.wav", np.zeros(160), 16000)
+    sf.write(synthetic_root / "pass.wav", np.zeros(240), 24000)
+    sf.write(synthetic_root / "fail.wav", np.zeros(240), 24000)
+    real = Sample(
+        sample_id="real_1",
+        path="real.wav",
+        label="real",
+        language="ru",
+        speaker_id="real_speaker",
+        source_dataset="fixture",
+        source_id="real_source",
+        license="fixture",
+        original_path="real.wav",
+        rights_reference="fixture",
+        usage_permission="approved",
+    )
+    base_synthetic = Sample(
+        sample_id="synthetic_pass",
+        path="pass.wav",
+        label="synthetic",
+        language="ru",
+        speaker_id="voice",
+        source_dataset="fixture",
+        source_id="synthetic_source",
+        generator_id="generator",
+        license="fixture",
+        original_path="pass.wav",
+        rights_reference="fixture",
+        usage_permission="approved",
+        intended_role="train",
+        quality_gate="pass",
+        training_eligible=True,
+        diagnostic_only=False,
+    )
+    rejected = base_synthetic.model_copy(
+        update={
+            "sample_id": "synthetic_fail",
+            "path": "fail.wav",
+            "source_id": "failed_source",
+            "original_path": "fail.wav",
+            "quality_gate": "fail",
+            "training_eligible": False,
+            "diagnostic_only": True,
+        }
+    )
+    write_manifest(real_root / "manifest.jsonl", [real])
+    write_manifest(synthetic_root / "manifest.jsonl", [base_synthetic, rejected])
+
+    output = compose_detector_corpus(
+        real_root / "manifest.jsonl", synthetic_root / "manifest.jsonl", tmp_path / "staged"
+    )
+    rows = read_manifest(output / "manifest.jsonl")
+    assert {row.sample_id for row in rows} == {"real_1", "synthetic_pass"}
+    assert all((output / row.path).is_file() and row.split is None for row in rows)

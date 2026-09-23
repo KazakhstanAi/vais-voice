@@ -26,7 +26,7 @@ runtime:
   executable: ../../../runs/modern-tts-pilot-v01/venv-qwen/Scripts/python.exe
   executable_sha256: 35b4bd456823c5ea3aba0856b95e113da92d5362a6fa7643f12aef9cc1a1875b
   script: ../../../scripts/run_qwen3_tts.py
-  script_sha256: f47fc306a5be4aecfff1e6cb9c993654a65f39e99a3b6f6d40ee00b2b1ae08fe
+  script_sha256: 08947c4bbb087be644dad2c307b3ba3822e2d3436a6fff0e794e5aec8e885ac1
   model_path: ../../../runs/modern-tts-pilot-v01/models/qwen3-tts-12hz-1.7b-customvoice
   model_sha256: 38b1d5971bdbd982b561cccec982669a53b0537c3cf5e9bd4778ed07bb2f5137
   speech_tokenizer_sha256: 836b7b357f5ea43e889936a3709af68dfe3751881acefe4ecf0dbd30ba571258
@@ -44,7 +44,16 @@ generation_params:
   top_p: 1.0
   temperature: 0.9
   repetition_penalty: 1.05
-  max_new_tokens: 2048
+  max_new_tokens: 512
+  max_tokens_per_character: 2.0
+  max_token_reserve: 32
+  min_new_tokens: 96
+  nominal_audio_token_rate_hz: 12
+  runaway_limit_fraction: 0.9
+  runaway_retry_attempts: 3
+  retry_seed_stride: 1
+  capitalize_initial: true
+  append_terminal_punctuation: true
 supports_seed: true
 license_review_acknowledged: true
 verification_status: verified
@@ -52,4 +61,4 @@ quality_gate: pass
 training_eligible: true
 diagnostic_only: false
 candidate: false
-quality_reason: Human review rated all five Russian samples very good, comparable in perceived quality to Yandex Alice, with no reported content or pronunciation failures.
+quality_reason: Human review rated all five Russian samples very good, comparable in perceived quality to Yandex Alice, with no reported content or pronunciation failures. FLEURS corpus generation capitalizes the initial letter, adds terminal punctuation when absent, uses a text-length-aware output cap, and rejects outputs that reach the truncation/runaway gate; scaled outputs still require sample-level audit.

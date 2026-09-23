@@ -31,6 +31,7 @@ class GenerationPlanConfig(BaseModel):
     output_dir: str
     languages: list[Literal["kk", "ru"]] = Field(min_length=1)
     max_texts_per_language: int = Field(gt=0)
+    max_text_characters: int | None = Field(default=None, gt=0)
     allowed_source_datasets: list[str] = Field(default_factory=list)
     allowed_generator_roles: list[GeneratorRole] = Field(min_length=1)
     generators: list[PlannedGenerator] = Field(min_length=1)
@@ -82,6 +83,10 @@ def create_plan(config_path: Path) -> Path:
             item
             for item in items
             if item.language == language
+            and (
+                config.max_text_characters is None
+                or len(item.text) <= config.max_text_characters
+            )
             and (
                 not config.allowed_source_datasets
                 or item.source_dataset in config.allowed_source_datasets

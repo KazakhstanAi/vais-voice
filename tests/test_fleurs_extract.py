@@ -29,5 +29,5 @@ def test_extract_fleurs_parquet_fixture(tmp_path):
     assert extract(source, destination, "train", 1) == 1
     assert len(list((destination / "audio").glob("*.wav"))) == 1
     fields = (destination / "metadata.tsv").read_text(encoding="utf-8").split("\t")
-    assert fields[0] == "train_17"
+    assert fields[0].startswith("train_17_")
     assert fields[2:4] == ["raw", "normalized"]

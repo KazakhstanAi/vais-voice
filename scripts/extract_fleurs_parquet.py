@@ -45,15 +45,16 @@ def extract(source: Path, destination: Path, split: str, maximum: int | None) ->
     for batch in parquet.iter_batches(batch_size=32, columns=columns):
         for row in batch.to_pylist():
             record_id = str(row["id"])
-            qualified_id = f"{split}_{record_id}"
-            if qualified_id in existing_ids:
-                continue
             audio = row["audio"]
             payload = audio.get("bytes") if isinstance(audio, dict) else None
             if not payload:
                 raise ValueError(f"FLEURS row {record_id} has no embedded audio bytes")
+            digest = hashlib.sha256(payload).hexdigest()
+            qualified_id = f"{split}_{record_id}_{digest[:12]}"
+            if qualified_id in existing_ids:
+                continue
             suffix = extension(payload)
-            filename = f"{qualified_id}_{hashlib.sha256(payload).hexdigest()[:12]}{suffix}"
+            filename = f"{qualified_id}{suffix}"
             target = audio_dir / filename
             with target.open("xb") as stream:
                 stream.write(payload)

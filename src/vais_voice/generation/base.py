@@ -33,3 +33,7 @@ class GeneratorAdapter(ABC):
         generation_params: dict[str, Any],
     ) -> GenerationResult:
         """Synthesize one item without silently replacing an existing output."""
+
+    def close(self) -> None:
+        """Release an optional persistent runtime owned by the adapter."""
+        return None

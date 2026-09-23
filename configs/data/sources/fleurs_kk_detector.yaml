@@ -1,0 +1,30 @@
+adapter: fleurs
+local_root: ../../../data/raw/fleurs_kk_detector
+metadata_file: metadata.tsv
+audio_dir: audio
+language: kk
+language_map:
+  Kazakh: kk
+  kk-KZ: kk
+columns:
+  path: file
+  speaker_id: speaker_id
+  source_id: id
+  transcript: transcription
+metadata:
+  source_id: fleurs_kk
+  name: Google FLEURS Kazakh
+  version: FLEURS
+  homepage_url: https://huggingface.co/datasets/google/fleurs
+  download_url: https://huggingface.co/datasets/google/fleurs/tree/main/parquet-data/kk_kz
+  license: Creative Commons Attribution 4.0 International (CC BY 4.0)
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  citation: "Conneau, A. et al. (2023). FLEURS: Few-shot Learning Evaluation of Universal Representations of Speech."
+  doi: 10.1109/SLT54892.2023.10023141
+  source_config: kk_kz
+  track: train
+  release_revision: 70bb2e84b976b7e960aa89f1c648e09c59f894dd
+  layout_version: google_fleurs_tsv_v1
+  languages: [kk]
+  intended_role: primary
+  notes: Deterministic 1000-record extraction from pinned official train parquet; speaker IDs are not exposed.

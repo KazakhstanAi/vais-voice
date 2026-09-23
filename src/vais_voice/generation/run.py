@@ -94,8 +94,18 @@ def _manifest_rows(
                 voice_id=job.voice_id,
                 generator_speaker_id=job.speaker_id,
                 generator_speaker_name=job.speaker_name,
-                generation_seed=job.seed,
-                generation_params=job.generation_params,
+                generation_seed=result.metadata.get("effective_seed", job.seed),
+                generation_params={
+                    **job.generation_params,
+                    **(
+                        {
+                            "effective_seed": result.metadata["effective_seed"],
+                            "generation_attempt": result.metadata["generation_attempt"],
+                        }
+                        if "effective_seed" in result.metadata
+                        else {}
+                    ),
+                },
                 intended_role=job.intended_role,
                 quality_gate=config.quality_gate,
                 training_eligible=config.training_eligible,
@@ -139,55 +149,64 @@ def run_plan(
         raise ValueError(f"Results contain jobs outside this plan: {sorted(unknown_results)}")
     adapters = {}
     stopped_error: RuntimeError | None = None
-    for job in jobs:
-        config = configs[job.generator_id]
-        config.require_generation_approval()
-        output = contained_path(run_dir, job.output_relative_path)
-        previous = results.get(job.job_id)
-        valid = _valid_output(output, previous)
-        if output.exists():
-            if policy == "fail":
-                raise ValueError(f"Output exists for {job.job_id}; policy=fail")
-            if policy == "skip" and valid:
-                results[job.job_id] = previous.model_copy(update={"status": "skipped"})
+    validated_adapters: set[str] = set()
+    try:
+        for job in jobs:
+            config = configs[job.generator_id]
+            config.require_generation_approval()
+            output = contained_path(run_dir, job.output_relative_path)
+            previous = results.get(job.job_id)
+            valid = _valid_output(output, previous)
+            if output.exists():
+                if policy == "fail":
+                    raise ValueError(f"Output exists for {job.job_id}; policy=fail")
+                if policy == "skip" and valid:
+                    results[job.job_id] = previous.model_copy(update={"status": "skipped"})
+                    _write_results(results_path, results)
+                    continue
+                if policy == "skip":
+                    raise ValueError(f"Existing output for {job.job_id} is not valid for this plan")
+                output.unlink()
+            adapter = adapters.setdefault(job.generator_id, adapter_from_config(config))
+            try:
+                if job.generator_id not in validated_adapters:
+                    adapter.validate_runtime()
+                    validated_adapters.add(job.generator_id)
+                runtime_voice = job.voice_id
+                if config.adapter == "piper":
+                    runtime_voice = str(job.speaker_id) if job.speaker_id is not None else None
+                generated = adapter.synthesize(
+                    texts[job.text_id],
+                    output,
+                    runtime_voice,
+                    job.seed,
+                    job.generation_params,
+                )
+                completed = generated.model_copy(
+                    update={"job_id": job.job_id, "output_relative_path": job.output_relative_path}
+                )
+                if not _valid_output(output, completed):
+                    raise RuntimeError(
+                        "Adapter returned output metadata that does not match its audio"
+                    )
+                results[job.job_id] = completed
+            except Exception as exc:
+                output.unlink(missing_ok=True)
+                results[job.job_id] = GenerationResult(
+                    job_id=job.job_id,
+                    status="failed",
+                    output_relative_path=job.output_relative_path,
+                    error=f"{type(exc).__name__}: {exc}",
+                )
                 _write_results(results_path, results)
+                if metadata["config"]["failure_policy"] == "stop":
+                    stopped_error = RuntimeError(f"Generation stopped after {job.job_id}: {exc}")
+                    break
                 continue
-            if policy == "skip":
-                raise ValueError(f"Existing output for {job.job_id} is not valid for this plan")
-            output.unlink()
-        adapter = adapters.setdefault(job.generator_id, adapter_from_config(config))
-        try:
-            adapter.validate_runtime()
-            runtime_voice = job.voice_id
-            if config.adapter == "piper":
-                runtime_voice = str(job.speaker_id) if job.speaker_id is not None else None
-            generated = adapter.synthesize(
-                texts[job.text_id],
-                output,
-                runtime_voice,
-                job.seed,
-                job.generation_params,
-            )
-            completed = generated.model_copy(
-                update={"job_id": job.job_id, "output_relative_path": job.output_relative_path}
-            )
-            if not _valid_output(output, completed):
-                raise RuntimeError("Adapter returned output metadata that does not match its audio")
-            results[job.job_id] = completed
-        except Exception as exc:
-            output.unlink(missing_ok=True)
-            results[job.job_id] = GenerationResult(
-                job_id=job.job_id,
-                status="failed",
-                output_relative_path=job.output_relative_path,
-                error=f"{type(exc).__name__}: {exc}",
-            )
             _write_results(results_path, results)
-            if metadata["config"]["failure_policy"] == "stop":
-                stopped_error = RuntimeError(f"Generation stopped after {job.job_id}: {exc}")
-                break
-            continue
-        _write_results(results_path, results)
+    finally:
+        for adapter in adapters.values():
+            adapter.close()
 
     rows = _manifest_rows(jobs, results, texts, configs)
     manifest_hashes = {}

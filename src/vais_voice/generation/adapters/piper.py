@@ -14,7 +14,13 @@ from vais_voice.utils.io import sha256
 
 
 class PiperGenerator(GeneratorAdapter):
+    def __init__(self, config):
+        super().__init__(config)
+        self._paths: tuple[str, Path] | None = None
+
     def _runtime(self) -> tuple[str, Path]:
+        if self._paths is not None:
+            return self._paths
         executable = str(self.config.runtime.get("executable", "piper"))
         executable_path = Path(executable)
         resolved = str(executable_path) if executable_path.is_file() else shutil.which(executable)
@@ -34,7 +40,8 @@ class PiperGenerator(GeneratorAdapter):
         for path, digest in expected.items():
             if digest and sha256(path) != digest:
                 raise RuntimeError(f"Pinned Piper artifact checksum mismatch: {path}")
-        return resolved, model
+        self._paths = (resolved, model)
+        return self._paths
 
     def _command_prefix(self, executable: str) -> list[str]:
         if self.config.runtime.get("entrypoint") == "python_module":
