@@ -1,4 +1,4 @@
-"""Training preflight only. This infrastructure milestone does not train models."""
+"""Validate or train a VAIS detector baseline from a reviewed split manifest."""
 
 import argparse
 from pathlib import Path
@@ -14,7 +14,7 @@ from vais_voice.utils.tracking import snapshot
 
 
 class TrainConfig(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="ignore")
     experiment: str = Field(min_length=1)
     seed: int = Field(ge=0)
     project_root: str
@@ -72,16 +72,19 @@ def main() -> None:
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
-    if not args.dry_run:
-        parser.exit(
-            2,
-            "Training is not implemented in MVP 0 infrastructure. "
-            "Use --dry-run to validate prepared data and record experiment provenance.\n",
-        )
     try:
-        print(f"Preflight saved: {preflight(args.config)}. No model trained.")
-    except (ValueError, OSError, KeyError) as exc:
-        parser.exit(2, f"Preflight failed: {exc}\n")
+        if args.dry_run:
+            print(f"Preflight saved: {preflight(args.config)}. No model trained.")
+        else:
+            try:
+                from vais_voice.detection.training import train_detector
+            except ImportError as exc:
+                raise ValueError(
+                    "Detector training requires the pinned ML environment; install .[ml]"
+                ) from exc
+            print(f"Training artifacts saved: {train_detector(args.config)}")
+    except (ValueError, OSError, KeyError, RuntimeError) as exc:
+        parser.exit(2, f"Training failed: {exc}\n")
 
 
 if __name__ == "__main__":

@@ -6,6 +6,31 @@ import numpy as np
 from sklearn.metrics import roc_auc_score, roc_curve
 
 
+def select_eer_threshold(labels: list[int], scores: list[float]) -> dict[str, float]:
+    """Choose a deployment threshold from validation data only."""
+    y = np.asarray(labels)
+    s = np.asarray(scores, dtype=float)
+    if len(y) == 0 or len(y) != len(s) or not np.isin(y, [0, 1]).all():
+        raise ValueError("Valid nonempty binary labels and matching scores required")
+    if len(np.unique(y)) < 2 or len(np.unique(s)) < 2 or not np.isfinite(s).all():
+        raise ValueError("Threshold selection requires two classes and nonconstant finite scores")
+    fpr, tpr, thresholds = roc_curve(y, s, drop_intermediate=False)
+    index = int(np.argmin(np.abs(fpr - (1.0 - tpr))))
+    threshold = float(thresholds[index])
+    if not np.isfinite(threshold):
+        finite = np.flatnonzero(np.isfinite(thresholds))
+        if not len(finite):
+            raise ValueError("No finite validation threshold")
+        index = int(finite[0])
+        threshold = float(thresholds[index])
+    return {
+        "threshold": threshold,
+        "validation_fpr": float(fpr[index]),
+        "validation_tpr": float(tpr[index]),
+        "validation_eer_gap": float(abs(fpr[index] - (1.0 - tpr[index]))),
+    }
+
+
 def detection_metrics(labels: list[int], scores: list[float]) -> dict[str, Any]:
     y = np.asarray(labels)
     s = np.asarray(scores, dtype=float)

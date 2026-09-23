@@ -2,15 +2,17 @@
 
 Reproducible KZ/RU synthetic speech detection and generation research infrastructure.
 
-Synthetic dataset v0.1 now provides provenance-aware text inventory, deterministic planning,
-resumable adapter execution, canonical manifests, and machine-readable reports. It does not train a
-detector or implement VAIS VoiceGen. See
+Synthetic dataset v0.1 provides provenance-aware text inventory, deterministic planning,
+resumable adapter execution, canonical manifests, and machine-readable reports. Detector Baseline
+v0.1 adds real PyTorch training, validation-only checkpoint and threshold selection, protected-test
+benchmark export, and checkpoint inference. It does not implement VAIS VoiceGen. See
 [`docs/synthetic-generation.md`](docs/synthetic-generation.md) for the protocol and commands.
 
 Исследование подлинности и генерации казахской, русской и смешанной речи.
-Сейчас это **инфраструктура, не SaaS и не готовая модель**. Нет реального benchmark,
-обучения детектора, VoiceGen, API или UI. Synthetic v0.1 создаёт исследовательские данные через
-настраиваемые внешние TTS-адаптеры; Detection — Phase 1, VAIS VoiceGen — Phase 2.
+Сейчас это **исследовательская инфраструктура, не production antifraud**. Training-код и два
+baseline реализованы, но опубликованного научного checkpoint ещё нет: локальный пилотный корпус
+слишком мал. Synthetic v0.1 создаёт данные через настраиваемые внешние TTS-адаптеры; Detection —
+Phase 1, VAIS VoiceGen — Phase 2.
 
 ## Быстрый старт
 
@@ -53,9 +55,15 @@ Split: train.parquet, val.parquet, test.parquet и manifest.split.parquet ряд
 Декодирование через libsndfile; неподдерживаемые форматы требуют контролируемой
 конвертации. Автоматического FFmpeg fallback пока нет.
 
-Training пока только preflight:
+Training preflight:
 `python -m vais_voice.train --config configs/detection/baseline.yaml --dry-run`.
-Без dry-run команда отказывается. Evaluate не загружает checkpoints.
+Настоящее обучение Baseline A:
+`python -m vais_voice.train --config configs/detection/baseline.yaml`.
+Baseline B использует frozen официальный `torchaudio` Wav2Vec2 encoder и MLP head:
+`python -m vais_voice.train --config configs/detection/baseline_ssl.yaml`.
+Обе конфигурации требуют полноценный split corpus с двумя классами в train/val/test; synthetic
+должны пройти quality gate и иметь `training_eligible=true`. Checkpoint и threshold выбираются
+только по validation. Test запускается после фиксации лучшего checkpoint.
 `python -m vais_voice.generation --help` показывает команды inventory/plan/run/report. Это pipeline
 датасета, а не VoiceGen.
 
@@ -110,9 +118,15 @@ MIT относится к коду, не к внешним данным/моде
 
 ## Окружение и Docker
 
-PyTorch не входит в base. Extra .[ml] содержит unpinned torch/torchaudio.
-Версии и CUDA wheels выбираем после проверки QAIRU. Для научного эксперимента
-зафиксируйте фактически установленное окружение.
+PyTorch не входит в base. Для проверенного Windows/NVIDIA окружения RTX 3060 Ti используется
+зафиксированная пара PyTorch/torchaudio 2.11.0 с CUDA 13.0:
+
+```powershell
+.venv\Scripts\python.exe -m pip install -r requirements-gpu-cu130.txt
+.venv\Scripts\python.exe -c "import torch; print(torch.__version__, torch.cuda.is_available())"
+```
+
+На другом сервере CUDA wheel выбирается заново и фиксируется в отчёте эксперимента.
 Отчёт сохраняет package versions, seed, Git commit/dirty, config, dataset/split versions,
 хеши; checkpoint пока null.
 
@@ -175,8 +189,8 @@ tests have no generator overlap with training.
 ## Этапы
 
 1. Phase 0: schema → prepare → protected splits → dummy inference → evaluation/report.
-2. Phase 1: согласованные/versioned реальные и synthetic данные → detector → benchmark.
-3. Phase 2: KZ/RU VoiceGen с правами на голоса и независимыми holdouts.
-4. После проверенных моделей: API/deployment.
+2. Phase 1A: два detector baseline → validation selection → checkpoint → inference API.
+3. Phase 1B: versioned real/synthetic corpus → настоящее обучение → protected benchmark.
+4. Phase 2: KZ/RU VoiceGen с правами на голоса и независимыми holdouts.
 
 Fixture-метрики никогда не являются научными результатами или гарантией подлинности.

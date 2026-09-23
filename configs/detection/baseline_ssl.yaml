@@ -1,25 +1,25 @@
-experiment: vais-detector-logmel-cnn-v0.1
+experiment: vais-detector-wav2vec2-frozen-v0.1
 seed: 42
 project_root: ../..
 prepared_manifest: data/processed/kzru_v1/manifest.split.parquet
 preparation_report: data/processed/kzru_v1/split_preparation.json
-run_dir: runs/detector-logmel-cnn-v0.1
+run_dir: runs/detector-wav2vec2-frozen-v0.1
 device: auto
-epochs: 30
-patience: 6
+epochs: 20
+patience: 5
 amp: true
 model:
-  architecture: logmel_cnn
+  architecture: wav2vec2_frozen_mlp
   sample_rate: 16000
   max_duration_seconds: 4.0
   n_mels: 64
   hidden_dim: 192
   ssl_bundle: WAV2VEC2_BASE
 optimizer:
-  learning_rate: 0.0003
+  learning_rate: 0.001
   weight_decay: 0.0001
 loader:
-  batch_size: 16
+  batch_size: 4
   num_workers: 0
   require_training_eligible: true
 unseen_generators: []
