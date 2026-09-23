@@ -1,0 +1,19 @@
+dataset_id: vais_kk_detector_synthetic_piper
+dataset_version: detector-synthetic-piper-kk-v0.1
+project_root: ../..
+text_inventory: runs/detector-corpus-v01/text_inventory.jsonl
+output_dir: runs/detector-corpus-v01/piper-kk-generation
+languages: [kk]
+max_texts_per_language: 500
+max_text_characters: 141
+allowed_source_datasets: [fleurs_kk]
+allowed_generator_roles: [train]
+seed_strategy: per_job_hash
+base_seed: 20260923
+output_format: wav
+output_sample_rate: null
+failure_policy: continue
+existing_output_policy: fail
+generators:
+  - config: generators/piper_kk_issai_high_legacy_1_2.yaml
+    enabled: true

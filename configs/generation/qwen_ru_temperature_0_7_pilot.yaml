@@ -1,0 +1,19 @@
+dataset_id: vais_qwen_ru_temperature_0_7_pilot
+dataset_version: qwen-ru-t07-pilot-v0.1
+project_root: ../..
+text_inventory: runs/detector-corpus-v01/text_inventory.jsonl
+output_dir: runs/detector-corpus-v01/qwen-ru-t07-pilot
+languages: [ru]
+max_texts_per_language: 5
+max_text_characters: 80
+allowed_source_datasets: [fleurs_ru]
+allowed_generator_roles: [train]
+seed_strategy: per_job_hash
+base_seed: 20260923
+output_format: wav
+output_sample_rate: null
+failure_policy: continue
+existing_output_policy: fail
+generators:
+  - config: generators/qwen3_tts_ru_temperature_0_7.yaml
+    enabled: true

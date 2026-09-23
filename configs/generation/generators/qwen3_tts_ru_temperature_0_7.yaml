@@ -1,0 +1,64 @@
+adapter: qwen3_tts
+provenance:
+  generator_id: G04_qwen3_tts_12hz_1_7b_ru_serena_t07
+  display_name: Qwen3-TTS 12Hz 1.7B / Serena / Russian / temperature 0.7 candidate
+  family: Qwen3-TTS
+  provider: Qwen / Alibaba Cloud
+  model_id: Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice
+  model_revision: 0c0e3051f131929182e2c023b9537f8b1c68adfe
+  model_version: Qwen3-TTS-12Hz-1.7B-CustomVoice
+  languages: [ru]
+  license: Apache-2.0
+  license_url: https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice/blob/0c0e3051f131929182e2c023b9537f8b1c68adfe/README.md
+  homepage_url: https://github.com/QwenLM/Qwen3-TTS
+  model_url: https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice/tree/0c0e3051f131929182e2c023b9537f8b1c68adfe
+  citation: Qwen3-TTS Technical Report, arXiv:2601.15621
+  intended_role: train
+  commercial_use_status: permissive
+  generator_model: Qwen3-TTS-12Hz-1.7B-CustomVoice/Serena
+  generator_runtime: qwen-tts-0.1.1 + torch-2.10.0+cu130
+  voice_repository: QwenLM/Qwen3-TTS
+  voice_repository_revision: 022e286b98fbec7e1e916cb940cdf532cd9f488e
+  voice_repository_license: Apache-2.0
+  retrieved_at: "2026-09-23"
+  notes: Candidate stabilization variant after temperature 0.9 repeatedly hit the output limit on FLEURS text.
+runtime:
+  executable: ../../../runs/modern-tts-pilot-v01/venv-qwen/Scripts/python.exe
+  executable_sha256: 35b4bd456823c5ea3aba0856b95e113da92d5362a6fa7643f12aef9cc1a1875b
+  script: ../../../scripts/run_qwen3_tts.py
+  script_sha256: 08947c4bbb087be644dad2c307b3ba3822e2d3436a6fff0e794e5aec8e885ac1
+  model_path: ../../../runs/modern-tts-pilot-v01/models/qwen3-tts-12hz-1.7b-customvoice
+  model_sha256: 38b1d5971bdbd982b561cccec982669a53b0537c3cf5e9bd4778ed07bb2f5137
+  speech_tokenizer_sha256: 836b7b357f5ea43e889936a3709af68dfe3751881acefe4ecf0dbd30ba571258
+  qwen_tts_version: 0.1.1
+  torch_version: 2.10.0+cu130
+  transformers_version: 4.57.3
+  accelerate_version: 1.12.0
+  cuda_runtime: "13.0"
+voices: [Serena]
+voice_id: Serena
+generation_params:
+  language: Russian
+  instruct: Speak naturally in a calm, neutral tone.
+  top_k: 50
+  top_p: 1.0
+  temperature: 0.7
+  repetition_penalty: 1.05
+  max_new_tokens: 512
+  max_tokens_per_character: 2.0
+  max_token_reserve: 32
+  min_new_tokens: 96
+  nominal_audio_token_rate_hz: 12
+  runaway_limit_fraction: 0.9
+  runaway_retry_attempts: 3
+  retry_seed_stride: 1
+  capitalize_initial: true
+  append_terminal_punctuation: true
+supports_seed: true
+license_review_acknowledged: true
+verification_status: verified
+quality_gate: pending
+training_eligible: false
+diagnostic_only: false
+candidate: true
+quality_reason: Same pinned model/runtime as the approved pilot, but temperature 0.7 and corpus text normalization require a new human quality gate before training use.
