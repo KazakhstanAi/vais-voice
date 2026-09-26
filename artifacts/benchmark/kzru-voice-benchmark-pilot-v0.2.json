@@ -1,0 +1,365 @@
+{
+  "benchmarkId": "vais-kzru-voice-benchmark",
+  "version": "pilot-v0.2",
+  "publishedAt": "2026-09-26",
+  "protocolVersion": "0.2",
+  "status": "research",
+  "models": [
+    {
+      "model_id": "G01_piper_kk_legacy_1_2",
+      "family": "Piper",
+      "provider": "rhasspy",
+      "revision": "320d5f7f7751a17ef6512d5c23863056c6a11c0f",
+      "runtime_id": "piper-standalone-1.2.0",
+      "runtime_version": "1.2.0",
+      "language": "kk",
+      "voice": "kk_KZ-issai-high:0",
+      "license": null,
+      "license_url": "https://huggingface.co/rhasspy/piper-voices/tree/320d5f7f7751a17ef6512d5c23863056c6a11c0f/kk/kk_KZ/issai/high",
+      "intended_role": "paired runtime diagnostic",
+      "verification_status": "partially_verified"
+    },
+    {
+      "model_id": "G01_piper_kk_1_8",
+      "family": "Piper",
+      "provider": "OHF-Voice / rhasspy voice archive",
+      "revision": "320d5f7f7751a17ef6512d5c23863056c6a11c0f",
+      "runtime_id": "piper-tts-1.8.0",
+      "runtime_version": "1.8.0",
+      "language": "kk",
+      "voice": "kk_KZ-issai-high:0",
+      "license": null,
+      "license_url": "https://huggingface.co/rhasspy/piper-voices/tree/320d5f7f7751a17ef6512d5c23863056c6a11c0f/kk/kk_KZ/issai/high",
+      "intended_role": "paired runtime diagnostic",
+      "verification_status": "partially_verified"
+    },
+    {
+      "model_id": "vais-detector-logmel-cnn-kk-v0.1",
+      "family": "logmel_cnn",
+      "provider": "VAIS Research",
+      "revision": "3a711c2fabfc85c7239940a229ed77adff1b28077760faa6b1dd80e9ed942ce0",
+      "runtime_id": "pytorch-cu130",
+      "runtime_version": "2.11.0+cu130",
+      "language": "kk",
+      "voice": null,
+      "license": "MIT (code); data/model source terms apply",
+      "license_url": null,
+      "intended_role": "research synthetic-speech detector diagnostic",
+      "verification_status": "verified"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "piper-kk-runtime-compat-diagnostic-v0.1",
+      "task": "paired_tts_runtime_diagnostic",
+      "status": "complete",
+      "model_id": null,
+      "dataset_version": null,
+      "metrics": {
+        "sample_count_per_runtime": 1,
+        "numeric_quality_score": null
+      },
+      "limitations": [
+        "One prompt only",
+        "Same voice model across both runtimes"
+      ]
+    },
+    {
+      "run_id": "vais-detector-logmel-cnn-kk-v0.1",
+      "task": "seen_generator_detection_diagnostic",
+      "status": "complete",
+      "model_id": "vais-detector-logmel-cnn-kk-v0.1",
+      "dataset_version": "kk-detector-pilot-v0.1",
+      "metrics": {
+        "scoreType": "model_evidence",
+        "calibrated": false,
+        "threshold": 0.99609375,
+        "thresholdSelection": "validation_eer",
+        "testSeen": {
+          "n": 233,
+          "real": 157,
+          "synthetic": 76,
+          "rocAuc": 1.0,
+          "eer": 0.0,
+          "fprAtTpr95": 0.0,
+          "scoreMin": 0.0007615089416503906,
+          "scoreMax": 0.9990234375,
+          "uniqueScores": 127,
+          "confusionAtFixedThreshold": { "tn": 157, "fp": 0, "fn": 2, "tp": 74 }
+        },
+        "testUnseen": {
+          "status": "undefined_single_class",
+          "n": 157,
+          "real": 157,
+          "synthetic": 0,
+          "rocAuc": null,
+          "eer": null,
+          "fprAtTpr95": null
+        }
+      },
+      "limitations": [
+        "One seen Piper generator only",
+        "Duration and generator/channel fingerprints may explain separation",
+        "No calibrated probability or authorship inference"
+      ]
+    },
+    {
+      "run_id": "kzru-protected-unseen-generator-v0.2",
+      "task": "protected_unseen_generator_evaluation",
+      "status": "planned",
+      "model_id": "vais-detector-logmel-cnn-kk-v0.1",
+      "dataset_version": null,
+      "metrics": { "rocAuc": null, "eer": null, "fprAtTpr95": null },
+      "limitations": ["No eligible held-out synthetic generator corpus"]
+    }
+  ],
+  "datasets": [
+    {
+      "dataset_id": "kk-detector-pilot-v0.1",
+      "version": "kk-known-generator-v0.1",
+      "language": "kk",
+      "role": "known-generator detector diagnostic",
+      "counts": {
+        "total": 1500,
+        "train": 1064,
+        "validation": 203,
+        "test": 233
+      },
+      "manifest_sha256": "f74ff1261c418c49acd923b8c89b300b4bf3a6c94056990bc630590ccf2f3afe",
+      "license": "FLEURS CC BY 4.0; synthetic generator/model terms separately recorded",
+      "limitations": [
+        "FLEURS reliable speaker IDs unavailable",
+        "Only Piper legacy 1.2 synthetic source",
+        "Real/synthetic duration distributions differ"
+      ]
+    }
+  ],
+  "samples": [
+    {
+      "sample_id": "diag_kk_piper_1_2_0",
+      "prompt_id": "runtime-compat-kk-hello-v01",
+      "model_id": "G01_piper_kk_legacy_1_2",
+      "runtime_id": "piper-standalone-1.2.0",
+      "language": "kk",
+      "audio_path": "artifacts/benchmark/audio/piper-kk-runtime-1.2.0.wav",
+      "sha256": "5c0469c08ec66969a7e758367af7d123b1c856eb0fb0c20fc8c2925b81e53048",
+      "bytes": 125716,
+      "duration_seconds": 2.849705215419501,
+      "sample_rate": 22050,
+      "channels": 1,
+      "quality_gate": "pass",
+      "human_review": {
+        "status": "pass",
+        "finding": "Good sound; almost indistinguishable from real speech.",
+        "source": "runs/piper-real-v01/runtime-compat-diagnostic/pronunciation_review.jsonl",
+        "reviewerCount": null
+      },
+      "evaluation_dimensions": {
+        "naturalness": {
+          "value": "pass",
+          "evidenceType": "derived_finding",
+          "source": "runs/piper-real-v01/runtime-compat-diagnostic/pronunciation_review.jsonl",
+          "reviewers": null,
+          "sampleCount": 1,
+          "note": "Derived from the free-form finding; not a structured rating."
+        },
+        "pronunciation": {
+          "value": "not_evaluated",
+          "evidenceType": "not_evaluated",
+          "source": null,
+          "reviewers": null,
+          "sampleCount": null,
+          "note": null
+        },
+        "prosody": {
+          "value": "not_evaluated",
+          "evidenceType": "not_evaluated",
+          "source": null,
+          "reviewers": null,
+          "sampleCount": null,
+          "note": null
+        },
+        "numbers_entities": {
+          "value": "not_evaluated",
+          "evidenceType": "not_evaluated",
+          "source": null,
+          "reviewers": null,
+          "sampleCount": null,
+          "note": null
+        },
+        "language_adherence": {
+          "value": "not_evaluated",
+          "evidenceType": "not_evaluated",
+          "source": null,
+          "reviewers": null,
+          "sampleCount": null,
+          "note": null
+        },
+        "stability": {
+          "value": "not_evaluated",
+          "evidenceType": "not_evaluated",
+          "source": null,
+          "reviewers": null,
+          "sampleCount": null,
+          "note": null
+        },
+        "code_switching": {
+          "value": "not_evaluated",
+          "evidenceType": "not_evaluated",
+          "source": null,
+          "reviewers": null,
+          "sampleCount": null,
+          "note": null
+        },
+        "robustness": {
+          "value": "not_evaluated",
+          "evidenceType": "not_evaluated",
+          "source": null,
+          "reviewers": null,
+          "sampleCount": null,
+          "note": null
+        },
+        "synthetic_detectability": {
+          "value": "pass",
+          "evidenceType": "derived_finding",
+          "source": "runs/piper-real-v01/runtime-compat-diagnostic/pronunciation_review.jsonl",
+          "reviewers": null,
+          "sampleCount": 1,
+          "note": "Derived only from 'almost indistinguishable'; not a detector measurement."
+        }
+      },
+      "source_artifact": "runs/piper-real-v01/runtime-compat-diagnostic/kk_piper_1.2.0.wav"
+    },
+    {
+      "sample_id": "diag_kk_piper_1_8_0",
+      "prompt_id": "runtime-compat-kk-hello-v01",
+      "model_id": "G01_piper_kk_1_8",
+      "runtime_id": "piper-tts-1.8.0",
+      "language": "kk",
+      "audio_path": "artifacts/benchmark/audio/piper-kk-runtime-1.8.0.wav",
+      "sha256": "22e237710069cd6786ba49044d1fd76dd71378ca6d395c2805875da1c150420f",
+      "bytes": 113708,
+      "duration_seconds": 2.5774149659863945,
+      "sample_rate": 22050,
+      "channels": 1,
+      "quality_gate": "warning",
+      "human_review": {
+        "status": "warning",
+        "finding": "Intelligible, but slight synthetic/AI character is audible.",
+        "source": "runs/piper-real-v01/runtime-compat-diagnostic/pronunciation_review.jsonl",
+        "reviewerCount": null
+      },
+      "evaluation_dimensions": {
+        "naturalness": {
+          "value": "warning",
+          "evidenceType": "derived_finding",
+          "source": "runs/piper-real-v01/runtime-compat-diagnostic/pronunciation_review.jsonl",
+          "reviewers": null,
+          "sampleCount": 1,
+          "note": "Derived from the free-form finding; not a structured rating."
+        },
+        "pronunciation": {
+          "value": "not_evaluated",
+          "evidenceType": "not_evaluated",
+          "source": null,
+          "reviewers": null,
+          "sampleCount": null,
+          "note": null
+        },
+        "prosody": {
+          "value": "not_evaluated",
+          "evidenceType": "not_evaluated",
+          "source": null,
+          "reviewers": null,
+          "sampleCount": null,
+          "note": null
+        },
+        "numbers_entities": {
+          "value": "not_evaluated",
+          "evidenceType": "not_evaluated",
+          "source": null,
+          "reviewers": null,
+          "sampleCount": null,
+          "note": null
+        },
+        "language_adherence": {
+          "value": "not_evaluated",
+          "evidenceType": "not_evaluated",
+          "source": null,
+          "reviewers": null,
+          "sampleCount": null,
+          "note": null
+        },
+        "stability": {
+          "value": "not_evaluated",
+          "evidenceType": "not_evaluated",
+          "source": null,
+          "reviewers": null,
+          "sampleCount": null,
+          "note": null
+        },
+        "code_switching": {
+          "value": "not_evaluated",
+          "evidenceType": "not_evaluated",
+          "source": null,
+          "reviewers": null,
+          "sampleCount": null,
+          "note": null
+        },
+        "robustness": {
+          "value": "not_evaluated",
+          "evidenceType": "not_evaluated",
+          "source": null,
+          "reviewers": null,
+          "sampleCount": null,
+          "note": null
+        },
+        "synthetic_detectability": {
+          "value": "warning",
+          "evidenceType": "derived_finding",
+          "source": "runs/piper-real-v01/runtime-compat-diagnostic/pronunciation_review.jsonl",
+          "reviewers": null,
+          "sampleCount": 1,
+          "note": "Derived from audible synthetic character; not a detector measurement."
+        }
+      },
+      "source_artifact": "runs/piper-real-v01/runtime-compat-diagnostic/kk_piper_1.8.0.wav"
+    }
+  ],
+  "metrics": {
+    "qualitative": { "numericScoresPublished": false, "reviewerCount": null },
+    "detector": {
+      "scope": "closed_set_seen_generator_diagnostic",
+      "protectedStatus": "planned_undefined"
+    }
+  },
+  "limitations": [
+    "Research publication; no independent verification procedure was performed.",
+    "Paired audio covers one prompt and two runtimes of the same model.",
+    "Human reviewer identity and count are unavailable for the paired finding records.",
+    "Detector result is Kazakh-only and closed-set against one seen Piper generator.",
+    "Protected unseen-generator evaluation is planned and metrics are undefined.",
+    "FLEURS speaker independence cannot be proven.",
+    "Real and synthetic duration distributions differ materially.",
+    "Synthetic evidence score is uncalibrated and is not a probability of authorship."
+  ],
+  "provenance": {
+    "researchRepositoryCommit": "bf1196a262d66a331f963c99a4094ce31754488e",
+    "frontendAuditedCommit": "fcf550a",
+    "detectorTrainingCommit": "26ae06bfb0fffde2775bce9200c3ab75b9dc8bda",
+    "detectorTrainingDirty": true,
+    "prompt": "Сәлеметсіз бе. Бұл қазақ тіліндегі тест.",
+    "sourceReviewSha256": "a0bab0a792580084bf06cbde8787e96bbac49c5efa48cb6ea36eb68d4ee76767",
+    "modelWeightsSha256": "4dee767c893e8535da821447d12cb030e3569e11254c14030a1da5d8b2222c16"
+  },
+  "artifactHashes": {
+    "protocol": "f107d4fb5c2ab4f5e94f9fdc9bdff2d97c4fdb4585d6eb8ccd6457c88f5f8e15",
+    "protocolConfig": "f71d963bef7bb97801dc99245f2086964824f2ae27bfbeffa7c58ec4ca562bb4",
+    "evidenceAudit": "375f5689e6f9a85a45d5157152aa5e02f98a925121ced65e4bfab21b255f7229",
+    "detectorCheckpoint": "3a711c2fabfc85c7239940a229ed77adff1b28077760faa6b1dd80e9ed942ce0",
+    "detectorManifest": "f74ff1261c418c49acd923b8c89b300b4bf3a6c94056990bc630590ccf2f3afe",
+    "detectorPreparation": "81425d2aea89d787350f88b2f20da6fd666cf2d638e1e34a4181486a5a2ee66e",
+    "piperRuntime120Audio": "5c0469c08ec66969a7e758367af7d123b1c856eb0fb0c20fc8c2925b81e53048",
+    "piperRuntime180Audio": "22e237710069cd6786ba49044d1fd76dd71378ca6d395c2805875da1c150420f"
+  }
+}

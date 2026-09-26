@@ -24,6 +24,7 @@ data/manifests/local/
 # Experiments: recordings, checkpoints, predictions, metrics, environment snapshots
 runs/
 *.wav
+!artifacts/benchmark/audio/*.wav
 *.flac
 *.mp3
 *.ogg

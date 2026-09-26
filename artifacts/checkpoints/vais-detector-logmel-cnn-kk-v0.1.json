@@ -1,0 +1,31 @@
+{
+  "model_id": "vais-detector-logmel-cnn-kk-v0.1",
+  "architecture": "logmel_cnn",
+  "training_config": "configs/detection/baseline_kk_pilot.yaml",
+  "run_config": "runs/detector-logmel-cnn-kk-v0.1/config.yaml",
+  "dataset_version": "kk-detector-pilot-v0.1",
+  "split_version": "kk-known-generator-v0.1",
+  "git_commit": "26ae06bfb0fffde2775bce9200c3ab75b9dc8bda",
+  "git_dirty": true,
+  "checkpoint_path": "runs/detector-logmel-cnn-kk-v0.1/best.pt",
+  "checkpoint_sha256": "3a711c2fabfc85c7239940a229ed77adff1b28077760faa6b1dd80e9ed942ce0",
+  "manifest_sha256": "f74ff1261c418c49acd923b8c89b300b4bf3a6c94056990bc630590ccf2f3afe",
+  "preparation_sha256": "81425d2aea89d787350f88b2f20da6fd666cf2d638e1e34a4181486a5a2ee66e",
+  "threshold": 0.99609375,
+  "threshold_selection": "validation_eer",
+  "score_type": "model_evidence",
+  "calibrated": false,
+  "decision_meaning": "research classification",
+  "input_sample_rate": 16000,
+  "max_duration_seconds": 4.0,
+  "device": "cuda",
+  "torch_version": "2.11.0+cu130",
+  "cuda_version": "13.0",
+  "created_at": "2026-09-23T13:18:59.973716+00:00",
+  "limitations": [
+    "Kazakh FLEURS versus one seen Piper generator only.",
+    "Protected unseen-generator metrics are undefined.",
+    "Duration and generator/channel fingerprints may dominate.",
+    "FLEURS speaker-disjointness cannot be proven."
+  ]
+}

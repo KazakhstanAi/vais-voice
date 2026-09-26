@@ -1,0 +1,47 @@
+{
+  "audit_version": "1.0",
+  "experiment": "vais-detector-logmel-cnn-kk-v0.1",
+  "status": "complete_with_limitations",
+  "manifest": "data/processed/kk_detector_pilot_v01/manifest.split.parquet",
+  "manifest_sha256": "f74ff1261c418c49acd923b8c89b300b4bf3a6c94056990bc630590ccf2f3afe",
+  "sample_count": 1500,
+  "split_counts": {"train": 1064, "validation": 203, "test": 233},
+  "cross_split_overlap": {
+    "processed_sha256": {"train_validation": 0, "train_test": 0, "validation_test": 0},
+    "source_sha256": {"train_validation": 0, "train_test": 0, "validation_test": 0},
+    "text_id": {"train_validation": 0, "train_test": 0, "validation_test": 0},
+    "normalized_text": {"train_validation": 0, "train_test": 0, "validation_test": 0},
+    "source_id": {"train_validation": 0, "train_test": 0, "validation_test": 0},
+    "source_record_id": {"train_validation": 0, "train_test": 0, "validation_test": 0},
+    "parent_sample_id": {"train_validation": 0, "train_test": 0, "validation_test": 0}
+  },
+  "duplicate_processed_sha256": 0,
+  "generator_split": {
+    "kind": "known_generator",
+    "generator_id": "G02_piper_kk_issai_high_legacy_1_2",
+    "present_in": ["train", "validation", "test_seen"],
+    "held_out_generators": []
+  },
+  "channel_checks": {
+    "codec": "wav for both classes",
+    "sample_rate": "16000 Hz for both classes",
+    "duration_seconds": {
+      "train": {"real_median": 12.36, "synthetic_median": 6.8526},
+      "validation": {"real_median": 12.18, "synthetic_median": 6.899},
+      "test": {"real_median": 11.58, "synthetic_median": 6.7248}
+    },
+    "duration_leakage_risk": "high",
+    "silence_pattern_status": "not_exhaustively_evaluated",
+    "replay_channel_status": "not_evaluated"
+  },
+  "speaker_audit": {
+    "status": "cannot_prove_disjointness",
+    "reason": "FLEURS does not provide reliable speaker IDs; per-row unknown placeholders are not identities."
+  },
+  "near_duplicate_prompt_check": {
+    "exact_normalized_overlap": 0,
+    "semantic_or_fuzzy_acoustic_overlap": "not_exhaustively_evaluated"
+  },
+  "decision": "block_new_experiment_until_independent_generator_and_confound_controls",
+  "publication_scope": "existing seen-generator pipeline diagnostic only"
+}

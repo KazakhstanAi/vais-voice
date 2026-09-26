@@ -1,0 +1,49 @@
+benchmark_id: vais-kzru-voice-benchmark
+version: pilot-v0.2
+protocol_version: "0.2"
+publication_status: research
+languages: [kk, ru]
+supported_tasks:
+  - paired_tts_runtime_diagnostic
+  - synthetic_speech_detection_diagnostic
+model_eligibility:
+  provenance_required: true
+  pinned_revision_required: true
+  runtime_identity_required: true
+  license_status_required: true
+prompt_categories: [general, numbers_entities, code_switching, stress]
+sample_inclusion:
+  require_audio_sha256: true
+  require_source_artifact: true
+  require_quality_gate: true
+human_review:
+  reviewer_must_be_human: true
+  preserve_disagreement: true
+  reviewer_count_nullable: true
+dimensions:
+  - naturalness
+  - pronunciation
+  - prosody
+  - numbers_entities
+  - language_adherence
+  - stability
+  - code_switching
+  - robustness
+  - synthetic_detectability
+dimension_states: [pass, warning, fail, not_evaluated, planned, derived]
+evidence_types: [human_review, automatic_metric, derived_finding, not_evaluated]
+automatic_metrics: [roc_auc, eer, fpr_at_tpr95]
+missing_data:
+  absent_measurement: not_evaluated
+  future_measurement: planned
+  not_equivalent_to_failure: true
+comparability_keys: [language, prompt_set, benchmark_version, evaluation_method, dataset_scope]
+publication_states: [research]
+protected_test:
+  status: planned
+  minimum_synthetic_samples: 50
+  minimum_real_samples: 50
+  held_out_generator_required: true
+artifact_retention:
+  published_snapshots_are_immutable: true
+  corrections_require_new_version: true
