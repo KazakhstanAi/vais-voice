@@ -1,0 +1,3 @@
+artifacts/benchmark/*.json text eol=lf
+artifacts/benchmark/*.sha256 text eol=lf
+artifacts/benchmark/audio/*.wav binary
