@@ -30,5 +30,20 @@ generated/requested UUID, and `temporary_decoding` stage; it does not log the be
 audio. Backend timeout behavior and external `/api/*` tunnel routing were not evaluated by the
 in-process client at this stage.
 
+## Remote release verification
+
+After deployment, remote D1 seeding, backend-token rotation, and FastAPI restart, the public gateway
+reported `inference=configured`, `mockMode=false`, the expected model/checkpoint, and CUDA. Public
+malformed WAV, malformed FLAC, audio-MIME/non-audio content, and unsupported-encoding requests all
+returned HTTP 400 with the fixed decode message and no machine path. A zero-byte upload returned
+HTTP 400 `Empty audio`. Automated log capture confirmed the original exception, request UUID, and
+`temporary_decoding` stage while excluding raw audio and bearer tokens.
+
+Remote `/api/benchmark` returned release `kzru-voice-benchmark-pilot-v0.2` and snapshot SHA-256
+`93877ceb35abf07d86b5f0ca8ff516783cf9e21393c58e5ba680e2b58b441a4c`. Downloaded public hashes
+were the same snapshot hash, Piper 1.2 WAV
+`5c0469c08ec66969a7e758367af7d123b1c856eb0fb0c20fc8c2925b81e53048`, and Piper 1.8 WAV
+`22e237710069cd6786ba49044d1fd76dd71378ca6d395c2805875da1c150420f`.
+
 Reproduce with `scripts/validate_local_detector_api.py`; output is printed to stdout and contains no
 token or raw audio.
