@@ -4,6 +4,9 @@ Status: **research**. Protocol version: **0.2**. Benchmark ID:
 `vais-kzru-voice-benchmark`. This protocol records reproducible evidence; it is not a claim of
 production antifraud readiness or a calibrated probability of authorship.
 
+The release ID is `kzru-voice-benchmark-pilot-v0.2`; it is the publication identifier formed from
+the benchmark identity and version. Existing `benchmarkId` and `version` fields remain canonical.
+
 ## Scope and eligibility
 
 The supported tasks are paired TTS runtime diagnostics and synthetic-speech detector diagnostics

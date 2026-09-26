@@ -1,6 +1,7 @@
 {
   "benchmarkId": "vais-kzru-voice-benchmark",
   "version": "pilot-v0.2",
+  "releaseId": "kzru-voice-benchmark-pilot-v0.2",
   "publishedAt": "2026-09-26",
   "protocolVersion": "0.2",
   "status": "research",
@@ -220,12 +221,12 @@
           "note": null
         },
         "synthetic_detectability": {
-          "value": "pass",
-          "evidenceType": "derived_finding",
-          "source": "runs/piper-real-v01/runtime-compat-diagnostic/pronunciation_review.jsonl",
+          "value": "not_evaluated",
+          "evidenceType": "not_evaluated",
+          "source": null,
           "reviewers": null,
-          "sampleCount": 1,
-          "note": "Derived only from 'almost indistinguishable'; not a detector measurement."
+          "sampleCount": null,
+          "note": "No detector measurement was performed for this paired sample."
         }
       },
       "source_artifact": "runs/piper-real-v01/runtime-compat-diagnostic/kk_piper_1.2.0.wav"
@@ -315,12 +316,12 @@
           "note": null
         },
         "synthetic_detectability": {
-          "value": "warning",
-          "evidenceType": "derived_finding",
-          "source": "runs/piper-real-v01/runtime-compat-diagnostic/pronunciation_review.jsonl",
+          "value": "not_evaluated",
+          "evidenceType": "not_evaluated",
+          "source": null,
           "reviewers": null,
-          "sampleCount": 1,
-          "note": "Derived from audible synthetic character; not a detector measurement."
+          "sampleCount": null,
+          "note": "No detector measurement was performed for this paired sample."
         }
       },
       "source_artifact": "runs/piper-real-v01/runtime-compat-diagnostic/kk_piper_1.8.0.wav"

@@ -3,7 +3,8 @@
 ## 1. Executive summary
 
 The release proves that VAIS can pin a voice model and runtime, retain exact audio and hashes, and
-connect detector results to reproducible data and checkpoint provenance. It does not prove general
+connect detector results to traceable checkpoint and dataset artifacts. The original training
+worktree was dirty, so the training run is not claimed as fully reproducible from its commit. It does not prove general
 deepfake detection. Protected unseen-generator evaluation remains planned.
 
 ## 2–6. Scope, models, dataset, review, and dimensions
@@ -11,8 +12,9 @@ deepfake detection. Protected unseen-generator evaluation remains planned.
 The public paired diagnostic compares Piper standalone 1.2.0 with piper-tts 1.8.0 using the same
 Kazakh model, voice, prompt, and one sample per runtime. Exact source and public hashes match.
 Review findings exist, but reviewer identity/count and structured dimension ratings do not.
-Naturalness and synthetic-detectability interpretations are marked derived; the other seven
-dimensions are not evaluated. Russian voice evidence may be displayed elsewhere but is not ranked
+Naturalness interpretations are marked derived. Synthetic detectability and the other seven
+dimensions are not evaluated at paired-sample level; detector diagnostics remain separate run-level
+evidence. Russian voice evidence may be displayed elsewhere but is not ranked
 against Kazakh evidence and is not part of the detector result.
 
 The detector dataset contains 1,500 Kazakh items: train 1,064 (707 real, 357 synthetic), validation

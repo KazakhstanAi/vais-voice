@@ -107,6 +107,7 @@ class RunRecord(StrictModel):
 class BenchmarkSnapshot(StrictModel):
     benchmarkId: str
     version: Literal["pilot-v0.2"]
+    releaseId: Literal["kzru-voice-benchmark-pilot-v0.2"]
     publishedAt: date
     protocolVersion: Literal["0.2"]
     status: Literal["research"]

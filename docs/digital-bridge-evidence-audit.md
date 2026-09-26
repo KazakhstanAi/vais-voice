@@ -16,8 +16,9 @@ Both use prompt `runtime-compat-kk-hello-v01`, text `Сәлеметсіз бе. 
 The raw findings are in
 `runs/piper-real-v01/runtime-compat-diagnostic/pronunciation_review.jsonl`. They contain a review
 status and free-form finding but no reviewer ID, reviewer count, timestamp, or structured
-dimension ratings. Therefore quality gates are direct record fields, while `naturalness` and
-`synthetic_detectability` projections are `derived_finding`. Pronunciation, prosody,
+dimension ratings. Therefore quality gates are direct record fields, while only `naturalness`
+is projected as `derived_finding`. `synthetic_detectability` is `not_evaluated` because perceived
+synthetic character is not a detector measurement. Pronunciation, prosody,
 numbers/entities, language adherence, stability, code-switching, and robustness are
 `not_evaluated`. No numeric human rating or consensus is claimed.
 
