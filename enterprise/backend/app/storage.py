@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import sqlite3
+import subprocess
 import uuid
 from datetime import UTC, datetime
 from pathlib import Path
@@ -17,6 +18,16 @@ ARTIFACTS = ROOT / "artifacts" / "runs"
 
 def now() -> str:
     return datetime.now(UTC).isoformat()
+
+
+def git_commit() -> str:
+    try:
+        return subprocess.run(
+            ["git", "-C", str(ROOT.parent), "rev-parse", "HEAD"],
+            check=True, capture_output=True, text=True, timeout=2,
+        ).stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        return "unavailable"
 
 
 def connection() -> sqlite3.Connection:
@@ -57,7 +68,7 @@ def add_target(payload: dict[str, Any]) -> dict[str, Any]:
 def create_run(target_item: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
     benchmark = load_benchmark()
     config_hash = hashlib.sha256(json.dumps(config, sort_keys=True).encode()).hexdigest()
-    item = {"id": str(uuid.uuid4()), "benchmark_id": benchmark["id"], "benchmark_version": benchmark["version"], "target_id": target_item["id"], "target_version": target_item["version"], "status": "running", "started_at": now(), "finished_at": None, "config_hash": config_hash, "dataset_hash": dataset_hash(), "result_hash": None, "evaluator_version": "0.1.0", "git_commit": "unavailable", "visibility": "private", "limitations_json": json.dumps(["Synthetic public demo dataset", "Retrieval metrics are not evaluated in v0.1"])}
+    item = {"id": str(uuid.uuid4()), "benchmark_id": benchmark["id"], "benchmark_version": benchmark["version"], "target_id": target_item["id"], "target_version": target_item["version"], "status": "running", "started_at": now(), "finished_at": None, "config_hash": config_hash, "dataset_hash": dataset_hash(), "result_hash": None, "evaluator_version": "0.1.0", "git_commit": git_commit(), "visibility": "private", "limitations_json": json.dumps(["Synthetic public demo dataset", "Retrieval metrics are not evaluated in v0.1"])}
     with connection() as conn:
         conn.execute("INSERT INTO benchmark_runs VALUES (:id,:benchmark_id,:benchmark_version,:target_id,:target_version,:status,:started_at,:finished_at,:config_hash,:dataset_hash,:result_hash,:evaluator_version,:git_commit,:visibility,:limitations_json)", item)
     return item
