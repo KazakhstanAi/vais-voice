@@ -1,0 +1,4 @@
+data/
+artifacts/runs/
+frontend/node_modules/
+frontend/dist/

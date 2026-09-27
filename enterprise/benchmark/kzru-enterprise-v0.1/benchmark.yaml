@@ -1,0 +1,10 @@
+id: kzru-enterprise
+name: KZ/RU Enterprise AI Benchmark
+version: v0.1
+published_at: '2026-09-27'
+languages: [kk, ru]
+categories: [answer_correctness, citation_accuracy, citation_completeness, hallucination, version_awareness, cross_language, insufficient_evidence, latency]
+methodology_status: public demo protocol
+limitations:
+  - Self-written synthetic policy documents only; not representative of a production corpus.
+  - Retrieval metrics are not evaluated because the bundled adapters receive the full evidence set.
